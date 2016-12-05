@@ -202,6 +202,7 @@ namespace VersionControl.UserInterface
 
         private void RefreshStatus()
         {
+            EditorApplication.SaveAssets();
             refreshInProgress = true;
             bool remoteProjectReflection = VCSettings.ProjectReflectionMode == VCSettings.EReflectionLevel.Remote;
             VCCommands.Instance.DeactivateRefreshLoop();
@@ -214,7 +215,6 @@ namespace VersionControl.UserInterface
                 refreshInProgress = false;                
                 RefreshGUI();
             });
-
         }
 
         private void DrawToolbar()
