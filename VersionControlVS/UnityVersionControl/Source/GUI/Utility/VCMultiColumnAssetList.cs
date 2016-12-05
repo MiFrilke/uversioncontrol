@@ -24,6 +24,7 @@ namespace VersionControl.UserInterface
 
         private MultiColumnState.Column columnSelection;
         private MultiColumnState.Column columnAssetPath;
+        private MultiColumnState.Column columnAssetName;
         private MultiColumnState.Column columnOwner;
         private MultiColumnState.Column columnFileStatus;
         private MultiColumnState.Column columnMetaStatus;
@@ -77,8 +78,15 @@ namespace VersionControl.UserInterface
             columnAssetPath = new MultiColumnState.Column(new GUIContent("AssetPath"), data =>
             {
                 return new GUIContent(
+                    text: data.assetPath.Compose()
+                );
+            });
+
+            columnAssetName = new MultiColumnState.Column(new GUIContent("Name"), data =>
+            {
+                return new GUIContent(
                     image: AssetDatabase.GetCachedIcon(data.assetPath.Compose()),
-                    text: " " + data.assetPath.Compose()
+                    text: System.IO.Path.GetFileName(data.assetPath.Compose())
                 );
             });
 
@@ -99,7 +107,7 @@ namespace VersionControl.UserInterface
                 if (r1Text == null) r1Text = "";
                 if (r2Text == null) r2Text = "";
                 //D.Log("Comparing: " + r1Text + " with " + r2Text + " : " + r1Text.CompareTo(r2Text));
-                return String.CompareOrdinal(r1Text, r2Text);
+                return String.Compare(r1Text, r2Text, StringComparison.OrdinalIgnoreCase);
             };
 
             Func<GenericMenu> rowRightClickMenu = () =>
@@ -191,11 +199,14 @@ namespace VersionControl.UserInterface
                 options.widthTable.Add(columnSelection.GetHeader().text, 25);
             }
 
-            multiColumnState.AddColumn(columnAssetPath);
-            options.widthTable.Add(columnAssetPath.GetHeader().text, 500);
+            multiColumnState.AddColumn(columnAssetName);
+            options.widthTable.Add(columnAssetName.GetHeader().text, 200);
 
             multiColumnState.AddColumn(columnFileStatus);
             options.widthTable.Add(columnFileStatus.GetHeader().text, 90);
+
+            multiColumnState.AddColumn(columnAssetPath);
+            options.widthTable.Add(columnAssetPath.GetHeader().text, 300);
 
             multiColumnState.AddColumn(columnMetaStatus);
             options.widthTable.Add(columnMetaStatus.GetHeader().text, 100);
