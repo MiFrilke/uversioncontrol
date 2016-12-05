@@ -73,7 +73,15 @@ namespace VersionControl.UserInterface
             guiFilter = s => true;
 
             columnSelection = new MultiColumnState.Column(new GUIContent("[]"), data => new GUIContent(masterSelection.Contains(data) ? " ☑" : " ☐"));
-            columnAssetPath = new MultiColumnState.Column(new GUIContent("AssetPath"), data => new GUIContent(data.assetPath.Compose()));
+
+            columnAssetPath = new MultiColumnState.Column(new GUIContent("AssetPath"), data =>
+            {
+                return new GUIContent(
+                    image: AssetDatabase.GetCachedIcon(data.assetPath.Compose()),
+                    text: " " + data.assetPath.Compose()
+                );
+            });
+
             columnOwner = new MultiColumnState.Column(new GUIContent("Owner"), data => new GUIContent(data.owner, data.lockToken));
             columnFileStatus = new MultiColumnState.Column(new GUIContent("Status"), GetFileStatusContent);
             columnMetaStatus = new MultiColumnState.Column(new GUIContent("Meta"), data => GetFileStatusContent(data.MetaStatus()));
@@ -175,7 +183,7 @@ namespace VersionControl.UserInterface
             options.rowStyle.onNormal.background = IconUtils.CreateSquareTexture(4, 1, new Color(0.24f, 0.5f, 0.87f, 0.75f));
             options.rowStyle.margin = new RectOffset(2, 2, 2, 1);
             options.rowStyle.border = new RectOffset(0, 0, 0, 0);
-            options.rowStyle.padding = new RectOffset(0, 0, 0, 0);
+            options.rowStyle.padding = new RectOffset(4, 4, 0, 0);
 
             if (showMasterSelection)
             {
