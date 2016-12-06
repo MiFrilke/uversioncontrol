@@ -16,7 +16,7 @@ internal static class MultiColumnView
     {
         public GUIStyle headerStyle;
         public GUIStyle rowStyle;
-        public Func<MultiColumnState<TD,TC>.Column, GenericMenu> headerRightClickMenu;
+        public Func<MultiColumnState<TD, TC>.Column, GenericMenu> headerRightClickMenu;
         public Func<GenericMenu> rowRightClickMenu;
         public Func<MultiColumnState<TD, TC>.Row, MultiColumnState<TD, TC>.Column, bool> cellClickAction;
         public float[] widths;
@@ -155,7 +155,7 @@ internal static class MultiColumnView
         var columns = row.Columns.ToArray();
         bool bHover = rect.Contains(Event.current.mousePosition);
         float x = rect.x;
-                
+
         for (int i = 0; i < widths.Length && i < columns.Length; ++i)
         {
             var width = widths[i];
@@ -203,7 +203,7 @@ internal static class MultiColumnView
             else
             {
                 dragTypeControl = DragType.Normal;
-                if(!cellClickAction())
+                if (!cellClickAction())
                     action();
             }
             GUIUtility.hotControl = id;
@@ -238,6 +238,16 @@ internal static class MultiColumnView
         bool bOn = selectedFunc();
         bool bKeyboardFocus = GUIUtility.keyboardControl == id;
 
-        style.Draw(rect, content, bHover, bActive, bOn, bKeyboardFocus);
+        // Draw image so that it doesn't get scaled first. Instead crop text.
+        if (content.text != null && content.text.Length > 0 && content.image != null)
+        {
+            Rect splitRect = new Rect(rect);
+            style.Draw(splitRect, new GUIContent(content.image), bHover, bActive, bOn, bKeyboardFocus);
+            splitRect.x += style.lineHeight + style.padding.left;
+            splitRect.width -= style.lineHeight + style.padding.left;
+            style.Draw(splitRect, content.text, bHover, bActive, bOn, bKeyboardFocus);
+        }
+        else
+            style.Draw(rect, content, bHover, bActive, bOn, bKeyboardFocus);
     }
 }
