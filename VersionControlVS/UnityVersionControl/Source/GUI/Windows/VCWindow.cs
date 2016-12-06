@@ -52,7 +52,7 @@ namespace VersionControl.UserInterface
         private bool GUIFilter(VersionControlStatus vcStatus)
         {
             if (searchString != null && searchString.Length > 0)
-                return vcStatus.assetPath.Compose().Contains(searchString);
+                return vcStatus.assetPath.Compose().IndexOf(searchString, System.StringComparison.OrdinalIgnoreCase) >= 0;
 
             var metaStatus = vcStatus.MetaStatus();
             bool projectSetting = vcStatus.assetPath.StartsWith("ProjectSettings/");
@@ -175,16 +175,6 @@ namespace VersionControl.UserInterface
             rect.x = 0.0f;
             statusHeight = rect.y = Mathf.Clamp(rect.y, toolbarHeight, position.height - inStatusHeight);
 
-            /*
-            Rect searchFieldRect = new Rect(120, 50, 200, EditorGUIUtility.singleLineHeight);
-            EditorGUI.BeginChangeCheck();
-            searchString = EditorGUI.TextField(searchFieldRect, "Search", searchString);
-            if (EditorGUI.EndChangeCheck())
-                UpdateFilteringOfKeys();
-                */
-
-            //GUILayout.BeginArea(new Rect(0, toolbarHeight + EditorGUIUtility.singleLineHeight, position.width, rect.y - toolbarHeight - EditorGUIUtility.singleLineHeight));
-
             GUILayout.BeginArea(new Rect(0, toolbarHeight, position.width, rect.y - toolbarHeight));
             vcMultiColumnAssetList.DrawGUI();
             GUILayout.EndArea();
@@ -271,15 +261,17 @@ namespace VersionControl.UserInterface
                     }
 
                     EditorGUI.BeginChangeCheck();
-                    searchString = EditorGUILayout.TextField(searchString, GUILayout.Height(15));
-                    if (searchString == null || searchString.Length == 0)
+                    EditorGUILayout.BeginHorizontal();
+                    searchString = EditorGUILayout.TextField(searchString, GUI.skin.FindStyle("ToolbarSeachTextField"));
+
+                    GUIStyle buttonStyle = searchString.Length > 0 ? GUI.skin.FindStyle("ToolbarSeachCancelButton") : GUI.skin.FindStyle("ToolbarSeachCancelButtonEmpty");
+                    if (GUILayout.Button("", buttonStyle))
                     {
-                        Rect searchFieldRect = GUILayoutUtility.GetLastRect();
-                        GUIStyle searchLabelStyle = new GUIStyle(EditorStyles.miniLabel);
-                        searchLabelStyle.contentOffset = new Vector2(2, -1);
-                        searchLabelStyle.normal.textColor = Color.gray;
-                        EditorGUI.LabelField(searchFieldRect, "Search...", searchLabelStyle);
+                        searchString = "";
+                        GUI.FocusControl(null);
+                        Repaint();
                     }
+                    EditorGUILayout.EndHorizontal();
                     if (EditorGUI.EndChangeCheck())
                         UpdateFilteringOfKeys();
                 }
@@ -368,4 +360,3 @@ namespace VersionControl.UserInterface
         }
     }
 }
-
