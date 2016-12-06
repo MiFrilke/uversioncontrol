@@ -97,7 +97,7 @@ namespace VersionControl.UserInterface
             columnConflict = new MultiColumnState.Column(new GUIContent("Conflict"), data => new GUIContent(data.treeConflictStatus.ToString()));
             columnChangelist = new MultiColumnState.Column(new GUIContent("ChangeList"), data => new GUIContent(data.changelist.Compose()));
 
-            var guiSkin = EditorGUIUtility.GetBuiltinSkin( EditorGUIUtility.isProSkin ? EditorSkin.Scene : EditorSkin.Inspector);
+            var guiSkin = EditorGUIUtility.GetBuiltinSkin(EditorGUIUtility.isProSkin ? EditorSkin.Scene : EditorSkin.Inspector);
             multiColumnState = new MultiColumnState();
 
             multiColumnState.Comparer = (r1, r2, c) =>
@@ -142,6 +142,9 @@ namespace VersionControl.UserInterface
             // Return value of true steals the click from normal selection, false does not.
             Func<MultiColumnState.Row, MultiColumnState.Column, bool> cellClickAction = (row, column) =>
             {
+                // Select referenced asset from row in project view.
+                Selection.activeObject = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(row.data.assetPath.Compose());
+
                 GUI.FocusControl("");
                 if (column == columnSelection)
                 {
@@ -292,10 +295,10 @@ namespace VersionControl.UserInterface
         private void ToggleMasterSelection()
         {
             var selected = multiColumnState.GetSelected();
-            if(selected.Any())
+            if (selected.Any())
             {
-                bool toggle = masterSelection.Contains( selected.First() );
-                foreach(var item in selected)
+                bool toggle = masterSelection.Contains(selected.First());
+                foreach (var item in selected)
                 {
                     if (toggle)
                         masterSelection.Remove(item);
