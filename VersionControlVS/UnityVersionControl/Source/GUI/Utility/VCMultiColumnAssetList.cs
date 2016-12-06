@@ -108,7 +108,7 @@ namespace VersionControl.UserInterface
                 if (r2Text == null) r2Text = "";
                 //D.Log("Comparing: " + r1Text + " with " + r2Text + " : " + r1Text.CompareTo(r2Text));
                 return String.Compare(r1Text, r2Text, StringComparison.OrdinalIgnoreCase);
-            };
+            };          
 
             Func<GenericMenu> rowRightClickMenu = () =>
             {
@@ -225,6 +225,16 @@ namespace VersionControl.UserInterface
 
             //columnConflictState.AddColumn(columnConflict);
             options.widthTable.Add(columnConflict.GetHeader().text, 80);
+
+            // Initialize column sorting from saved EditorPrefs.
+            multiColumnState.Ascending = EditorPrefs.GetBool("VCMultiColumnState_Ascending", true);
+            int savedColumnIndex = EditorPrefs.GetInt("VCMultiColumnState_ColumnIndex", 0);
+            //Debug.Log("Init: Get saved column index: " + savedColumnIndex);
+            //Debug.Log("Init: Get saved ascending bool: " + multiColumnState.Ascending);
+            var savedColumn = multiColumnState.GetColumnByIndex(savedColumnIndex);
+            //Debug.Log("Getting: " + savedColumn.GetHeader().text);
+            if (savedColumn != null)
+                multiColumnState.SetSortByColumn(savedColumn);
         }
 
         public void SetBaseFilter(Func<VersionControlStatus, bool> newBaseFilter)
@@ -257,6 +267,24 @@ namespace VersionControl.UserInterface
         public void RefreshGUIFilter()
         {
             ProfilerUtilities.BeginSample("MultiColumnAssetList::RefreshGUIFilter");
+
+            var domainDatas = interrestingStatus.Where(status => guiFilter(status));
+
+            /*
+            var dataWithLabels = domainDatas.ToList();
+            foreach (var item in dataWithLabels.ToList())
+            {
+                int index = dataWithLabels.IndexOf(item) + 1;
+                VersionControlStatus status = new VersionControlStatus();
+                status.assetPath = System.IO.Path.GetDirectoryName(item.assetPath.Compose());
+                status.allowLocalEdit = false;
+                status.owner = "Label";
+
+                if(!dataWithLabels.Any(x => x.assetPath == status.assetPath))
+                    dataWithLabels.Insert(index, status);
+            }
+            //multiColumnState.Refresh(dataWithLabels);
+            */
             multiColumnState.Refresh(interrestingStatus.Where(status => guiFilter(status)));
             ProfilerUtilities.EndSample();
         }

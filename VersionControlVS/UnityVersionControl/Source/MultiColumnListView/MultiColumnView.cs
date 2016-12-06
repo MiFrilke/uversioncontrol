@@ -58,7 +58,19 @@ internal static class MultiColumnView
         float maxWidth = widths.Sum();
 
         var headerRect = new Rect(0, 0, maxWidth, headerHeight);
-        ListViewHeader(headerRect, c => { multiColumnState.Accending = !multiColumnState.Accending; multiColumnState.SetSortByColumn(c); }, () => false, multiColumnState.GetColumns(), mvcOption);
+        ListViewHeader(headerRect, c => 
+        {
+            multiColumnState.Ascending = !multiColumnState.Ascending;
+            multiColumnState.SetSortByColumn(c);
+
+            // Save column sorting for restore on window relaunch.
+            int index = multiColumnState.GetColumnIndex(c);
+            EditorPrefs.SetBool("VCMultiColumnState_Ascending", multiColumnState.Ascending);
+            EditorPrefs.SetInt("VCMultiColumnState_ColumnIndex", index);
+            //Debug.Log("Save: column index: " + index);
+            //Debug.Log("Save: ascending bool: " + multiColumnState.Ascending);
+        },
+            () => false, multiColumnState.GetColumns(), mvcOption);
 
         int lowIdx = Mathf.RoundToInt(mvcOption.scrollbarPos.y);
         int highIdx = lowIdx + size;

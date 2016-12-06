@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 internal class MultiColumnState<TD, TC>
 {
@@ -108,7 +109,7 @@ internal class MultiColumnState<TD, TC>
     private void SortByColumn()
     {
         if (sortByColumn != null && Comparer != null)
-            rows.Sort((l, r) => Comparer(l, r, sortByColumn) * (Accending ? 1 : -1));
+            rows.Sort((l, r) => Comparer(l, r, sortByColumn) * (Ascending ? 1 : -1));
     }
 
     public void SetSortByColumn(Column column)
@@ -124,7 +125,20 @@ internal class MultiColumnState<TD, TC>
     }
 
     public Func<Row, Row, Column, int> Comparer { private get; set; }
-    public bool Accending { get; set; }
+    public bool Ascending { get; set; }
+
+    public Column GetColumnByIndex(int index)
+    {
+        if (index >= 0 && index < columns.Count && columns.Count > index)
+            return columns[index];
+        else
+            return null;
+    }
+
+    public int GetColumnIndex(MultiColumnState<TD, TC>.Column c)
+    {
+        return columns.IndexOf(c);
+    }
 
     List<Row> rows;
     Column sortByColumn;
