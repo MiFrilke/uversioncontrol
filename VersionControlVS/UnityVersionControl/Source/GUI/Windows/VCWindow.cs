@@ -41,7 +41,7 @@ namespace VersionControl.UserInterface
 
         // Cache
         private Vector2 statusScroll = Vector2.zero;
-        private string searchString;
+        private string searchString = "";
 
         [MenuItem("Window/UVC/Overview Window", false, 1)]
         public static void Init()
