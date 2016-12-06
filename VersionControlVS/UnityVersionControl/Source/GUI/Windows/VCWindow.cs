@@ -41,7 +41,7 @@ namespace VersionControl.UserInterface
 
         // Cache
         private Vector2 statusScroll = Vector2.zero;
-
+        private string searchString;
 
         [MenuItem("Window/UVC/Overview Window", false, 1)]
         public static void Init()
@@ -51,6 +51,9 @@ namespace VersionControl.UserInterface
 
         private bool GUIFilter(VersionControlStatus vcStatus)
         {
+            if (searchString != null && searchString.Length > 0)
+                return vcStatus.assetPath.Compose().Contains(searchString);
+
             var metaStatus = vcStatus.MetaStatus();
             bool projectSetting = vcStatus.assetPath.StartsWith("ProjectSettings/");
             bool unversioned = vcStatus.fileStatus == VCFileStatus.Unversioned;
@@ -106,7 +109,7 @@ namespace VersionControl.UserInterface
             VCCommands.Instance.StatusCompleted += RefreshGUI;
             VCCommands.Instance.OperationCompleted += OperationComplete;
             VCCommands.Instance.ProgressInformation += ProgressInformation;
-            VCSettings.SettingChanged += Repaint;            
+            VCSettings.SettingChanged += Repaint;
 
             rect = new Rect(0, statusHeight, position.width, 40.0f);
         }
@@ -115,7 +118,7 @@ namespace VersionControl.UserInterface
         {
             EditorPrefs.SetBool("VCWindow/showUnversioned", showUnversioned);
             EditorPrefs.SetBool("VCWindow/showMeta", showMeta);
-            EditorPrefs.SetBool("VCWindow/showModifiedNoLock", showModifiedNoLock);            
+            EditorPrefs.SetBool("VCWindow/showModifiedNoLock", showModifiedNoLock);
             EditorPrefs.SetFloat("VCWindow/statusHeight", statusHeight);
 
             VCCommands.Instance.StatusCompleted -= RefreshGUI;
@@ -172,6 +175,16 @@ namespace VersionControl.UserInterface
             rect.x = 0.0f;
             statusHeight = rect.y = Mathf.Clamp(rect.y, toolbarHeight, position.height - inStatusHeight);
 
+            /*
+            Rect searchFieldRect = new Rect(120, 50, 200, EditorGUIUtility.singleLineHeight);
+            EditorGUI.BeginChangeCheck();
+            searchString = EditorGUI.TextField(searchFieldRect, "Search", searchString);
+            if (EditorGUI.EndChangeCheck())
+                UpdateFilteringOfKeys();
+                */
+
+            //GUILayout.BeginArea(new Rect(0, toolbarHeight + EditorGUIUtility.singleLineHeight, position.width, rect.y - toolbarHeight - EditorGUIUtility.singleLineHeight));
+
             GUILayout.BeginArea(new Rect(0, toolbarHeight, position.width, rect.y - toolbarHeight));
             vcMultiColumnAssetList.DrawGUI();
             GUILayout.EndArea();
@@ -212,7 +225,7 @@ namespace VersionControl.UserInterface
             VCCommands.Instance.StatusTask(statusLevel, detailLevel).ContinueWithOnNextUpdate(t =>
             {
                 VCCommands.Instance.ActivateRefreshLoop();
-                refreshInProgress = false;                
+                refreshInProgress = false;
                 RefreshGUI();
             });
         }
@@ -234,7 +247,7 @@ namespace VersionControl.UserInterface
                     {
                         updateInProgress = true;
                         EditorUtility.DisplayProgressBar(VCSettings.VersionControlBackend + " Updating", "", 0.0f);
-                        VCCommands.Instance.UpdateTask();                        
+                        VCCommands.Instance.UpdateTask();
                     }
                     if (GUILayout.Button(Terminology.revert, EditorStyles.toolbarButton, buttonLayout))
                     {
@@ -256,6 +269,19 @@ namespace VersionControl.UserInterface
                     {
                         VCCommands.Instance.CommitDialog(GetSelectedAssets().ToArray(), true);
                     }
+
+                    EditorGUI.BeginChangeCheck();
+                    searchString = EditorGUILayout.TextField(searchString, GUILayout.Height(15));
+                    if (searchString == null || searchString.Length == 0)
+                    {
+                        Rect searchFieldRect = GUILayoutUtility.GetLastRect();
+                        GUIStyle searchLabelStyle = new GUIStyle(EditorStyles.miniLabel);
+                        searchLabelStyle.contentOffset = new Vector2(2, -1);
+                        searchLabelStyle.normal.textColor = Color.gray;
+                        EditorGUI.LabelField(searchFieldRect, "Search...", searchLabelStyle);
+                    }
+                    if (EditorGUI.EndChangeCheck())
+                        UpdateFilteringOfKeys();
                 }
 
                 GUILayout.FlexibleSpace();
@@ -267,7 +293,7 @@ namespace VersionControl.UserInterface
                     UpdateFilteringOfKeys();
                 }
 
-                bool newShowModifiedNoLock = GUILayout.Toggle(showModifiedNoLock, Terminology.localModified , EditorStyles.toolbarButton, new[] { GUILayout.MaxWidth(90) });
+                bool newShowModifiedNoLock = GUILayout.Toggle(showModifiedNoLock, Terminology.localModified, EditorStyles.toolbarButton, new[] { GUILayout.MaxWidth(90) });
                 if (newShowModifiedNoLock != showModifiedNoLock)
                 {
                     showModifiedNoLock = newShowModifiedNoLock;
