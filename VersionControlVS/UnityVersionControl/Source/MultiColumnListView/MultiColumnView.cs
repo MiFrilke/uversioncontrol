@@ -40,7 +40,7 @@ internal static class MultiColumnView
 
         float scrollbarWidth = 0.0f;
         float total = multiColumnState.GetRowCount();
-        int size = Mathf.RoundToInt((rect.height - headerHeight) / rowHeight);
+        int size = Mathf.FloorToInt((rect.height - headerHeight) / rowHeight);
         if (total > size)
         {
             scrollbarWidth = 16.0f;
