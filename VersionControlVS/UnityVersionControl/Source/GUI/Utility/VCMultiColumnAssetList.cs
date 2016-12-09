@@ -268,24 +268,25 @@ namespace VersionControl.UserInterface
         {
             ProfilerUtilities.BeginSample("MultiColumnAssetList::RefreshGUIFilter");
 
-            var domainDatas = interrestingStatus.Where(status => guiFilter(status));
-
-            /*
-            var dataWithLabels = domainDatas.ToList();
-            foreach (var item in dataWithLabels.ToList())
+            // HACK: We want to display bold folder labels above our rows like the old Unity Asset Server window.
+            // Therefore, for each folder path we add an additional asset which only displays the path.
+            // Used in MultiColumnView.ListViewRow to draw bold labels without any meta information when isFolderLabel is true.
+            List<VersionControlStatus> dataWithLabels = interrestingStatus.Where(status => guiFilter(status)).ToList();
+            foreach (VersionControlStatus item in dataWithLabels.ToList())
             {
                 int index = dataWithLabels.IndexOf(item) + 1;
                 VersionControlStatus status = new VersionControlStatus();
                 status.assetPath = System.IO.Path.GetDirectoryName(item.assetPath.Compose());
                 status.allowLocalEdit = false;
-                status.owner = "Label";
+                status.isFolderLabel = true;
 
                 if(!dataWithLabels.Any(x => x.assetPath == status.assetPath))
                     dataWithLabels.Insert(index, status);
             }
-            //multiColumnState.Refresh(dataWithLabels);
-            */
-            multiColumnState.Refresh(interrestingStatus.Where(status => guiFilter(status)));
+            multiColumnState.Refresh(dataWithLabels);
+            // End Hack.
+            
+            //multiColumnState.Refresh(interrestingStatus.Where(status => guiFilter(status)));
             ProfilerUtilities.EndSample();
         }
 

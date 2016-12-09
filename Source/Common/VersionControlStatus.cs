@@ -109,5 +109,8 @@ namespace VersionControl
         public int lastModifiedRevision;
         public bool allowLocalEdit = false;
         public bool Reflected { get { return reflectionLevel == VCReflectionLevel.Local || reflectionLevel == VCReflectionLevel.Repository; } }
+
+        // Used for HACK: Draw bold folder labels above rows.
+        public bool isFolderLabel;
     }
 }

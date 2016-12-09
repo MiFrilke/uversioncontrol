@@ -58,7 +58,7 @@ internal static class MultiColumnView
         float maxWidth = widths.Sum();
 
         var headerRect = new Rect(0, 0, maxWidth, headerHeight);
-        ListViewHeader(headerRect, c => 
+        ListViewHeader(headerRect, c =>
         {
             multiColumnState.Ascending = !multiColumnState.Ascending;
             multiColumnState.SetSortByColumn(c);
@@ -174,7 +174,25 @@ internal static class MultiColumnView
             var column = columns[i];
 
             var r = new Rect(x, rect.y, width, rect.height);
-            ListViewCell<TD>(r, action, _ => { }, selectedFunc, bHover, column.GetContent(row.data), mvcOption.rowStyle, mvcOption.rowRightClickMenu, () => mvcOption.cellClickAction(row, column));
+
+            // HACK: For each dummy item, which only represents a folder, we want to draw it as a bold label above.
+            // Only works when rows are sorted by ascending asset path.
+            VersionControl.VersionControlStatus status = row.data as VersionControl.VersionControlStatus;
+            GUIStyle style = mvcOption.rowStyle;
+            GUIContent content = column.GetContent(row.data);
+
+            if (status.isFolderLabel)
+            {
+                style = EditorStyles.boldLabel;
+                content = new GUIContent(status.assetPath.Compose());
+
+                // Only display the name column with the folder path and leave all others empty.
+                if (column.GetHeader().text != "Name")
+                    content = GUIContent.none;
+            }
+            // End hack.
+
+            ListViewCell<TD>(r, action, _ => { }, selectedFunc, bHover, content, style, mvcOption.rowRightClickMenu, () => mvcOption.cellClickAction(row, column));
             x += width;
         }
     }
