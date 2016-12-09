@@ -49,7 +49,8 @@ namespace VersionControl.UserInterface
         [MenuItem("Window/UVC/Overview Window %0", false, 1)]
         public static void Init()
         {
-            GetWindow<VCWindow>(false, "VersionControl");
+            EditorWindow window = GetWindow<VCWindow>(desiredDockNextTo: typeof(SceneView));
+            window.titleContent = new GUIContent("VersionControl");
         }
 
         private bool GUIFilter(VersionControlStatus vcStatus)
