@@ -42,6 +42,9 @@ namespace VersionControl.UserInterface
         // Cache
         private Vector2 statusScroll = Vector2.zero;
         private string searchString = "";
+        private GUIStyle toolbarSearchTextStyle;
+        private GUIStyle cancelSearchButtonStyle;
+        private GUIStyle cancelSearchButtonEmptyStyle;
 
         [MenuItem("Window/UVC/Overview Window", false, 1)]
         public static void Init()
@@ -51,7 +54,7 @@ namespace VersionControl.UserInterface
 
         private bool GUIFilter(VersionControlStatus vcStatus)
         {
-            if (searchString != null && searchString.Length > 0)
+            if (searchString.Length > 0)
                 return vcStatus.assetPath.Compose().IndexOf(searchString, System.StringComparison.OrdinalIgnoreCase) >= 0;
 
             var metaStatus = vcStatus.MetaStatus();
@@ -260,20 +263,7 @@ namespace VersionControl.UserInterface
                         VCCommands.Instance.CommitDialog(GetSelectedAssets().ToArray(), true);
                     }
 
-                    EditorGUI.BeginChangeCheck();
-                    EditorGUILayout.BeginHorizontal();
-                    searchString = EditorGUILayout.TextField(searchString, GUI.skin.FindStyle("ToolbarSeachTextField"));
-
-                    GUIStyle buttonStyle = searchString.Length > 0 ? GUI.skin.FindStyle("ToolbarSeachCancelButton") : GUI.skin.FindStyle("ToolbarSeachCancelButtonEmpty");
-                    if (GUILayout.Button("", buttonStyle))
-                    {
-                        searchString = "";
-                        GUI.FocusControl(null);
-                        Repaint();
-                    }
-                    EditorGUILayout.EndHorizontal();
-                    if (EditorGUI.EndChangeCheck())
-                        UpdateFilteringOfKeys();
+                    DrawSearchField();
                 }
 
                 GUILayout.FlexibleSpace();
@@ -336,6 +326,34 @@ namespace VersionControl.UserInterface
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.Separator();
             }
+        }
+
+        private void DrawSearchField()
+        {
+            // Create search bar styles if needed.
+            if (toolbarSearchTextStyle == null)
+                toolbarSearchTextStyle = GUI.skin.FindStyle("ToolbarSeachTextField");
+
+            if (cancelSearchButtonStyle == null)
+                cancelSearchButtonStyle = GUI.skin.FindStyle("ToolbarSeachCancelButton");
+
+            if (cancelSearchButtonEmptyStyle == null)
+                cancelSearchButtonEmptyStyle = GUI.skin.FindStyle("ToolbarSeachCancelButtonEmpty");
+
+            GUIStyle buttonStyle = searchString.Length > 0 ? cancelSearchButtonStyle : cancelSearchButtonEmptyStyle;
+
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.BeginHorizontal();
+            searchString = EditorGUILayout.TextField(searchString, toolbarSearchTextStyle);
+
+            if (GUILayout.Button(string.Empty, buttonStyle))
+            {
+                searchString = string.Empty;
+                GUI.FocusControl(null); // Clears the search text field visually.
+            }
+            EditorGUILayout.EndHorizontal();
+            if (EditorGUI.EndChangeCheck())
+                UpdateFilteringOfKeys();
         }
 
         private void DrawStatus()
