@@ -46,7 +46,7 @@ namespace VersionControl.UserInterface
         private GUIStyle cancelSearchButtonStyle;
         private GUIStyle cancelSearchButtonEmptyStyle;
 
-        [MenuItem("Window/UVC/Overview Window", false, 1)]
+        [MenuItem("Window/UVC/Overview Window %0", false, 1)]
         public static void Init()
         {
             GetWindow<VCWindow>(false, "VersionControl");
