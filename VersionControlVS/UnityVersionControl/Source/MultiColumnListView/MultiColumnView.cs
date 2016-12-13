@@ -29,7 +29,7 @@ internal static class MultiColumnView
     static readonly int listViewHash = "MultiColumnView.ListView".GetHashCode();
     static int selectedIdx = -1;
 
-    public static void ListView<TD>(Rect rect, MultiColumnState<TD, TC> multiColumnState, MultiColumnViewOption<TD> mvcOption)
+    public static void ListView<TD>(Rect rect, MultiColumnState<TD, TC> multiColumnState, MultiColumnViewOption<TD> mvcOption, Action onReorder)
     {
         VersionControl.ProfilerUtilities.BeginSample("MultiColumnView::ListView");
         bool controlModifier = ((Application.platform == RuntimePlatform.OSXEditor) ? Event.current.command : Event.current.control);
@@ -60,8 +60,16 @@ internal static class MultiColumnView
         var headerRect = new Rect(0, 0, maxWidth, headerHeight);
         ListViewHeader(headerRect, c =>
         {
-            multiColumnState.Ascending = !multiColumnState.Ascending;
+            // When sorting by AssetPath, we actually want to enfore ascending sort order.
+            if (c.GetHeader().text != "AssetPath")
+                multiColumnState.Ascending = !multiColumnState.Ascending;
+            else
+                multiColumnState.Ascending = true;
+
             multiColumnState.SetSortByColumn(c);
+
+            if (onReorder != null)
+                onReorder.Invoke();
 
             // Save column sorting for restore on window relaunch.
             int index = multiColumnState.GetColumnIndex(c);
@@ -179,6 +187,8 @@ internal static class MultiColumnView
             // Only works when rows are sorted by ascending asset path.
             VersionControl.VersionControlStatus status = row.data as VersionControl.VersionControlStatus;
             GUIStyle style = mvcOption.rowStyle;
+            style.padding.left = 10;
+            style.padding.right = 5;
             GUIContent content = column.GetContent(row.data);
 
             if (status.isFolderLabel)

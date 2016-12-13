@@ -116,6 +116,8 @@ internal class MultiColumnState<TD, TC>
     {
         sortByColumn = column;
         SortByColumn();
+
+        selectedColumnIndex = GetColumnIndex(column);
     }
 
     public void PerformActionOnSelected(Action<TD> action)
@@ -140,6 +142,12 @@ internal class MultiColumnState<TD, TC>
         return columns.IndexOf(c);
     }
 
+    public int SelectedColumnIndex
+    {
+        get { return selectedColumnIndex; }
+    }
+
+    int selectedColumnIndex = -1;
     List<Row> rows;
     Column sortByColumn;
     readonly List<Column> columns = new List<Column>();

@@ -1,4 +1,4 @@
-﻿// Copyright (c) <2012> <Playdead>
+// Copyright (c) <2012> <Playdead>
 // This file is subject to the MIT License as seen in the trunk of this repository
 // Maintained by: <Kristian Kjems> <kristian.kjems+UnityVC@gmail.com>
 using System;
@@ -108,7 +108,7 @@ namespace VersionControl.UserInterface
                 if (r2Text == null) r2Text = "";
                 //D.Log("Comparing: " + r1Text + " with " + r2Text + " : " + r1Text.CompareTo(r2Text));
                 return String.Compare(r1Text, r2Text, StringComparison.OrdinalIgnoreCase);
-            };          
+            };
 
             Func<GenericMenu> rowRightClickMenu = () =>
             {
@@ -229,6 +229,8 @@ namespace VersionControl.UserInterface
             // Initialize column sorting from saved EditorPrefs.
             multiColumnState.Ascending = EditorPrefs.GetBool("VCMultiColumnState_Ascending", true);
             int savedColumnIndex = EditorPrefs.GetInt("VCMultiColumnState_ColumnIndex", 0);
+            if (savedColumnIndex == 2 && multiColumnState.Ascending) // AssetPath
+                showBoldLabels = true;
             //Debug.Log("Init: Get saved column index: " + savedColumnIndex);
             //Debug.Log("Init: Get saved ascending bool: " + multiColumnState.Ascending);
             var savedColumn = multiColumnState.GetColumnByIndex(savedColumnIndex);
@@ -236,6 +238,8 @@ namespace VersionControl.UserInterface
             if (savedColumn != null)
                 multiColumnState.SetSortByColumn(savedColumn);
         }
+
+        bool showBoldLabels;
 
         public void SetBaseFilter(Func<VersionControlStatus, bool> newBaseFilter)
         {
@@ -268,25 +272,33 @@ namespace VersionControl.UserInterface
         {
             ProfilerUtilities.BeginSample("MultiColumnAssetList::RefreshGUIFilter");
 
-            // HACK: We want to display bold folder labels above our rows like the old Unity Asset Server window.
-            // Therefore, for each folder path we add an additional asset which only displays the path.
-            // Used in MultiColumnView.ListViewRow to draw bold labels without any meta information when isFolderLabel is true.
-            List<VersionControlStatus> dataWithLabels = interrestingStatus.Where(status => guiFilter(status)).ToList();
-            foreach (VersionControlStatus item in dataWithLabels.ToList())
-            {
-                int index = dataWithLabels.IndexOf(item) + 1;
-                VersionControlStatus status = new VersionControlStatus();
-                status.assetPath = System.IO.Path.GetDirectoryName(item.assetPath.Compose());
-                status.allowLocalEdit = false;
-                status.isFolderLabel = true;
+            showBoldLabels = multiColumnState.Ascending && multiColumnState.SelectedColumnIndex == 2;
 
-                if(!dataWithLabels.Any(x => x.assetPath == status.assetPath))
-                    dataWithLabels.Insert(index, status);
+            if (showBoldLabels)
+            {
+                // HACK: We want to display bold folder labels above our rows like the old Unity Asset Server window.
+                // Therefore, for each folder path we add an additional asset which only displays the path.
+                // Used in MultiColumnView.ListViewRow to draw bold labels without any meta information when isFolderLabel is true.
+                List<VersionControlStatus> dataWithLabels = interrestingStatus.Where(status => guiFilter(status)).ToList();
+                foreach (VersionControlStatus item in dataWithLabels.ToList())
+                {
+                    int index = dataWithLabels.IndexOf(item) + 1;
+                    VersionControlStatus status = new VersionControlStatus();
+                    status.assetPath = System.IO.Path.GetDirectoryName(item.assetPath.Compose());
+                    status.allowLocalEdit = false;
+                    status.isFolderLabel = true;
+
+                    if (!dataWithLabels.Any(x => x.assetPath == status.assetPath))
+                        dataWithLabels.Insert(index, status);
+                }
+                multiColumnState.Refresh(dataWithLabels);
             }
-            multiColumnState.Refresh(dataWithLabels);
+            else
+            {
+                multiColumnState.Refresh(interrestingStatus.Where(status => guiFilter(status)));
+            }
             // End Hack.
-            
-            //multiColumnState.Refresh(interrestingStatus.Where(status => guiFilter(status)));
+
             ProfilerUtilities.EndSample();
         }
 
@@ -347,7 +359,7 @@ namespace VersionControl.UserInterface
 
             Rect rect = GUILayoutUtility.GetRect(5, float.MaxValue, 5, float.MaxValue, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             GUI.Box(rect, "");
-            MultiColumnView.ListView(rect, multiColumnState, options);
+            MultiColumnView.ListView(rect, multiColumnState, options, RefreshGUIFilter);
         }
 
 
