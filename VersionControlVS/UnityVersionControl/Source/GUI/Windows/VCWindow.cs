@@ -233,16 +233,22 @@ namespace VersionControl.UserInterface
 
                 using (new PushState<bool>(GUI.enabled, VCCommands.Instance.Ready && !refreshInProgress, v => GUI.enabled = v))
                 {
+                    // HACK
+                    if (GUILayout.Button("Folder", EditorStyles.toolbarButton, buttonLayout))
+                    {
+                        System.Diagnostics.Process.Start(System.IO.Directory.GetParent(Application.dataPath).FullName);
+                    }
                     if (GUILayout.Button(Terminology.status, EditorStyles.toolbarButton, buttonLayout))
                     {
                         RefreshStatus();
                     }
-                    if (GUILayout.Button(Terminology.update, EditorStyles.toolbarButton, buttonLayout))
-                    {
-                        updateInProgress = true;
-                        EditorUtility.DisplayProgressBar(VCSettings.VersionControlBackend + " Updating", "", 0.0f);
-                        VCCommands.Instance.UpdateTask();
-                    }
+                    // Update functionality has a serious bug, where prefabs might become corrupted.
+                    //if (GUILayout.Button(Terminology.update, EditorStyles.toolbarButton, buttonLayout))
+                    //{
+                    //    updateInProgress = true;
+                    //    EditorUtility.DisplayProgressBar(VCSettings.VersionControlBackend + " Updating", "", 0.0f);
+                    //    VCCommands.Instance.UpdateTask();
+                    //}
                     if (GUILayout.Button(Terminology.revert, EditorStyles.toolbarButton, buttonLayout))
                     {
                         VCCommands.Instance.Revert(GetSelectedAssets().ToArray());
