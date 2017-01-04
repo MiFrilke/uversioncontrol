@@ -206,7 +206,7 @@ namespace VersionControl
                 string baseAssetPath = VCCommands.Instance.GetBasePath(assetPath);
                 if (!string.IsNullOrEmpty(baseAssetPath))
                 {
-                    if (EditorSettings.serializationMode == SerializationMode.ForceBinary)
+                    if ((EditorSettings.serializationMode == SerializationMode.ForceBinary || EditorSettings.serializationMode == SerializationMode.Mixed) && IsBinaryAsset(assetPath))
                     {
                         if (!Directory.Exists(tempDirectory))
                             Directory.CreateDirectory(tempDirectory);
@@ -230,6 +230,11 @@ namespace VersionControl
         public static bool IsDiffableAsset(ComposedString assetPath)
         {
             return mergablePostfix.Any(assetPath.EndsWith) || requiresTextConversionPostfix.Any(assetPath.EndsWith);
+        }
+
+        public static bool IsBinaryAsset(ComposedString assetPath)
+        {
+            return requiresTextConversionPostfix.Any(assetPath.EndsWith);
         }
 
         public static bool IsMergableAsset(ComposedString assetPath)

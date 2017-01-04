@@ -21,3 +21,4 @@ Assemblies/release
 
 # mstest test results
 TestResults
+*.suo
