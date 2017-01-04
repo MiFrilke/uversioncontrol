@@ -209,7 +209,7 @@ namespace VersionControl.UserInterface
 
         private void RefreshStatus()
         {
-            EditorApplication.SaveAssets();
+            AssetDatabase.SaveAssets();
             refreshInProgress = true;
             bool remoteProjectReflection = VCSettings.ProjectReflectionMode == VCSettings.EReflectionLevel.Remote;
             VCCommands.Instance.DeactivateRefreshLoop();
