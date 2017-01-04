@@ -1,4 +1,4 @@
-// Copyright (c) <2012> <Playdead>
+// Copyright (c) <2017> <Playdead>
 // This file is subject to the MIT License as seen in the trunk of this repository
 // Maintained by: <Kristian Kjems> <kristian.kjems+UnityVC@gmail.com>
 using System;
@@ -125,7 +125,7 @@ internal static class MultiColumnView
         GUI.EndGroup();
 
 
-        int id = GUIUtility.GetControlID(listViewHash, FocusType.Native);
+        int id = GUIUtility.GetControlID(listViewHash, FocusType.Passive);
         Event ev = Event.current;
         EventType evt = ev.GetTypeForControl(id);
         if (rect.Contains(ev.mousePosition) && evt == EventType.MouseDown && ev.button == 0)
@@ -209,7 +209,7 @@ internal static class MultiColumnView
 
     static void ListViewCell<TD>(Rect rect, Action action, Action<Vector2> dragAction, Func<bool> selectedFunc, bool bHover, GUIContent content, GUIStyle style, Func<GenericMenu> contextMenu, Func<bool> cellClickAction)
     {
-        int id = GUIUtility.GetControlID(listViewCellHash, FocusType.Native);
+        int id = GUIUtility.GetControlID(listViewCellHash, FocusType.Passive);
         Event e = Event.current;
         switch (e.GetTypeForControl(id))
         {

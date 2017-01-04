@@ -1,4 +1,4 @@
-// Copyright (c) <2012> <Playdead>
+// Copyright (c) <2017> <Playdead>
 // This file is subject to the MIT License as seen in the trunk of this repository
 // Maintained by: <Kristian Kjems> <kristian.kjems+UnityVC@gmail.com>
 using System;
@@ -55,7 +55,7 @@ namespace VersionControl
         private static System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
 
         private IVersionControlCommands vcc;        
-        private Action refreshAssetDatabaseSynchronous = () => AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+        private Action refreshAssetDatabaseSynchronous = () => AssetDatabase.Refresh();
 
         public bool FlusingFiles { get; private set; }
         public event Action<string> ProgressInformation;
@@ -246,7 +246,7 @@ namespace VersionControl
             {
                 FlusingFiles = true;
                 //D.Log("Flusing files");
-                EditorApplication.SaveAssets();
+                AssetDatabase.SaveAssets();
                 FlusingFiles = false;
             }
             //else Debug.Log("Ignoring 'FlushFiles' due to Execution context");
