@@ -224,7 +224,7 @@ namespace VersionControl
             }
         }
 
-        static readonly ComposedString[] requiresTextConversionPostfix  = new ComposedString[] { ".unity", ".prefab", ".mat", ".asset" };
+        static readonly ComposedString[] requiresTextConversionPostfix  = new ComposedString[] { ".unity", ".prefab", ".mat", ".asset", ".anim"};
         static readonly ComposedString[] mergablePostfix                = new ComposedString[] { ".cs", ".js", ".boo", ".text", ".shader", ".txt", ".xml", ".cginc" };
         
         public static bool IsDiffableAsset(ComposedString assetPath)
