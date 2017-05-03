@@ -126,6 +126,11 @@ namespace VersionControl
             }
         }
 
+        public static string GetRevision()
+        {
+            return VCCommands.Instance.GetRevision();
+        }
+
         public static bool VCDialog(string command, Object obj)
         {
             return VCDialog(command, obj.ToAssetPaths());
