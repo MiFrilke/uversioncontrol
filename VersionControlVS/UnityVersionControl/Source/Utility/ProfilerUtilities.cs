@@ -12,19 +12,19 @@ namespace VersionControl
         [Conditional("ENABLE_PROFILER")]
         public static void BeginSample(string name)
         {
-            ProfilerUtilities.BeginSample(name);
+            UnityEngine.Profiler.BeginSample(name);
         }
 
         [Conditional("ENABLE_PROFILER")]
         public static void BeginSample(string name, Object targetObject)
         {
-            ProfilerUtilities.BeginSample(name, targetObject);
+            UnityEngine.Profiler.BeginSample(name, targetObject);
         }
 
         [Conditional("ENABLE_PROFILER")]
         public static void EndSample()
         {
-            ProfilerUtilities.EndSample();
+            UnityEngine.Profiler.EndSample();
         }
     }
 }

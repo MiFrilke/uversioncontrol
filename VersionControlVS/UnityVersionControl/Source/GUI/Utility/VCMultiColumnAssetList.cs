@@ -361,19 +361,5 @@ namespace VersionControl.UserInterface
             GUI.Box(rect, "");
             MultiColumnView.ListView(rect, multiColumnState, options, RefreshGUIFilter);
         }
-
-
-        private void ToggleColumn(MultiColumnState.Column column)
-        {
-            if (multiColumnState.ExistColumn(column))
-                multiColumnState.RemoveColumn(column);
-            else
-                multiColumnState.AddColumn(column);
-        }
-
-        private bool ValidateColumn(MultiColumnState.Column column)
-        {
-            return !multiColumnState.ExistColumn(column) || multiColumnState.CountColumns() > 1;
-        }
     }
 }

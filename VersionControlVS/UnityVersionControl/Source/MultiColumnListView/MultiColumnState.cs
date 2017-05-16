@@ -65,7 +65,22 @@ internal class MultiColumnState<TD, TC>
 
     public void Refresh(IEnumerable<TD> domainDatas)
     {
+        var tmp = rows;
         rows = domainDatas.Select((d, index) => new Row(ref d, columns)).ToList();
+
+        // restore selection from before refresh
+        if (tmp != null)
+        {
+            foreach (var row in tmp)
+            {
+                int iIndex = -1;
+                if (row.selected && ((iIndex = rows.FindIndex(x => x.data.Equals(row.data))) != -1))
+                {
+                    rows[iIndex].selected = true;
+                }
+            }
+        }
+
         SortByColumn();
     }
 

@@ -112,5 +112,14 @@ namespace VersionControl
 
         // Used for HACK: Draw bold folder labels above rows.
         public bool isFolderLabel;
+
+        public override bool Equals(object _obj)
+        {
+            if (_obj == null) return false;
+            var other = _obj as VersionControlStatus;
+            if ((object)other == null) return false;
+
+            return assetPath.Equals(other.assetPath);
+        }
     }
 }
