@@ -631,7 +631,7 @@ namespace VersionControl
             if (initialAssetCount == 0) return true;
 
             assets = assets.AddFilesInFolders().AddFolders(vcc).AddMoveMatches(vcc);
-            var dependencies = assets.GetDependencies().AddFilesInFolders().AddFolders(vcc).Concat(assets.AddDeletedInFolders(vcc));
+            var dependencies = VCSettings.IncludeDepedenciesAsDefault ? assets.GetDependencies().AddFilesInFolders().AddFolders(vcc).Concat(assets.AddDeletedInFolders(vcc)) : new List<string>();
             var allAssets = assets.Concat(dependencies).Distinct().ToList();
             var localModified = allAssets.LocalModified(vcc);
             if (assets.Contains(SceneManagerUtilities.GetCurrentScenePath()))

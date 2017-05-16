@@ -142,8 +142,6 @@ namespace VersionControl.UserInterface
             // Return value of true steals the click from normal selection, false does not.
             Func<MultiColumnState.Row, MultiColumnState.Column, bool> cellClickAction = (row, column) =>
             {
-                // Select referenced asset from row in project view.
-                Selection.activeObject = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(row.data.assetPath.Compose());
 
                 GUI.FocusControl("");
                 if (column == columnSelection)
@@ -167,10 +165,16 @@ namespace VersionControl.UserInterface
                         else
                             masterSelection.Add(row.data);
                     }
+
                     return true;
                 }
+                
                 return false;
-                //D.Log(row.data.assetPath.Compose() + " : "  + column.GetContent(row.data).text);
+            };
+
+            Action selectionChangedAction = () =>
+            {
+                Selection.objects = multiColumnState.GetSelected().Select(x => AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(x.assetPath.Compose())).ToArray();
             };
 
             options = new MultiColumnViewOption
@@ -180,6 +184,7 @@ namespace VersionControl.UserInterface
                 rowRightClickMenu = rowRightClickMenu,
                 headerRightClickMenu = headerRightClickMenu,
                 cellClickAction = cellClickAction,
+                selectionChangedAction = selectionChangedAction,
                 widths = new float[] { 200 },
                 doubleClickAction = status =>
                 {

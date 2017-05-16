@@ -19,6 +19,7 @@ internal static class MultiColumnView
         public Func<MultiColumnState<TD, TC>.Column, GenericMenu> headerRightClickMenu;
         public Func<GenericMenu> rowRightClickMenu;
         public Func<MultiColumnState<TD, TC>.Row, MultiColumnState<TD, TC>.Column, bool> cellClickAction;
+        public Action selectionChangedAction;
         public float[] widths;
         public Vector2 scrollbarPos;
         public readonly Dictionary<string, float> widthTable = new Dictionary<string, float>();
@@ -101,11 +102,13 @@ internal static class MultiColumnView
                         var selection = totalRows.Where((_, idx) => InBetween(idx, selectedIdx, currentIdx));
                         foreach (var e in selection)
                             e.selected = true;
+                        mvcOption.selectionChangedAction();
                     }
                     else
                     {
                         selectedIdx = currentIdx;
                         rowIt.selected = !rowIt.selected;
+                        mvcOption.selectionChangedAction();
                     }
                     if (Event.current.clickCount > 1)
                     {
