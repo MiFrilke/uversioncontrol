@@ -70,7 +70,7 @@ namespace VersionControl
                 PrefabHelper.IsPrefab(obj, true, false, true);
         }
 
-        public static void ApplyAndCommit(Object obj, string commitMessage = "", bool showCommitDialog = false)
+        public static void ApplyAndCommit(Object obj, string commitMessage = "", bool showCommitDialog = true)
         {
             var gameObject = obj as GameObject;
             if (ObjectUtilities.ChangesStoredInScene(obj)) SceneManagerUtilities.SaveActiveScene();
@@ -234,7 +234,7 @@ namespace VersionControl
         
         public static bool IsDiffableAsset(ComposedString assetPath)
         {
-            return mergablePostfix.Any(assetPath.EndsWith) || requiresTextConversionPostfix.Any(assetPath.EndsWith);
+            return true;
         }
 
         public static bool IsBinaryAsset(ComposedString assetPath)

@@ -100,7 +100,7 @@ namespace VersionControl
         public bool Ready { 
             get 
             {
-                return Active && vcc.IsReady() && !EditorApplication.isCompiling; 
+                return Active && vcc.IsReady(); 
             } 
         }
 
@@ -625,7 +625,7 @@ namespace VersionControl
             }
         }
 
-        public bool CommitDialog(IEnumerable<string> assets, bool showUserConfirmation = false, string commitMessage = "")
+        public bool CommitDialog(IEnumerable<string> assets, bool showUserConfirmation = true, string commitMessage = "")
         {
             int initialAssetCount = assets.Count();
             if (initialAssetCount == 0) return true;

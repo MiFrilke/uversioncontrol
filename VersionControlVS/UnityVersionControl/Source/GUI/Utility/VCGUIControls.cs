@@ -193,8 +193,8 @@ namespace VersionControl.UserInterface
 
         private static void Commit(string assetPath, Object instance)
         {
-            if (instance != null) VCUtility.ApplyAndCommit(instance);
-            else VCCommands.Instance.CommitDialog(new[] { assetPath });
+            // Never Commit without Commit Dialog
+            VCCommands.Instance.CommitDialog(new[] { assetPath });
         }
 
         private static void Revert(string assetPath, Object instance)
