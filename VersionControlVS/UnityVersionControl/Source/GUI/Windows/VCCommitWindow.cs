@@ -88,12 +88,6 @@ namespace VersionControl.UserInterface
         private void OnEnable()
         {
             minSize  = new Vector2(1000, 400);
-            position = new Rect {
-                xMin    = Screen.width * 0.5f - this.minSize.x,
-                yMin    = Screen.height * 0.5f - this.minSize.y,
-                width   = this.minSize.x,
-                height  = this.minSize.y
-            };
             commitMessageHeight = EditorPrefs.GetFloat("VCCommitWindow/commitMessageHeight", 140.0f);
             rect = new Rect(0, commitMessageHeight, position.width, 10.0f);
             vcMultiColumnAssetList = new VCMultiColumnAssetList(Repaint, VCSettings.SelectiveCommit);
