@@ -85,7 +85,7 @@ namespace VersionControl
             };
             vcc.StatusCompleted += OnStatusCompleted;
             OnNextUpdate.Do(Start);
-            EditorApplication.playmodeStateChanged += OnPlaymodeStateChanged;
+            EditorApplication.playModeStateChanged += OnPlaymodeStateChanged;
         }
 
         public static bool Active
@@ -201,7 +201,7 @@ namespace VersionControl
             return result;
         }
 
-        private void OnPlaymodeStateChanged()
+        private void OnPlaymodeStateChanged(PlayModeStateChange state)
         {
             if (updating)
             {
@@ -416,6 +416,19 @@ namespace VersionControl
         {
             if (FlusingFiles) return false;
             return vcc.RequestStatus(assets, statusLevel);
+        }
+
+        public string Log(string asset = "", string _strArguments = "")
+        {
+            return HandleExceptions(() =>
+            {
+                return vcc.Log(asset, _strArguments);
+            });
+        }
+
+        public string Info()
+        {
+            return vcc.Info();
         }
 
         public bool Update(IEnumerable<string> assets = null)

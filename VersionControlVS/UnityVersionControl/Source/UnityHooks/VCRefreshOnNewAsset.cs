@@ -89,6 +89,7 @@ namespace VersionControl
                 {
                     currentFolder += folderIt + pathSeparator;
                     parentFolders.Add(currentFolder.TrimEnd(pathSeparator));
+                    //Debug.Log(currentFolder.TrimEnd(pathSeparator) + " -> " + VCCommands.Instance.GetAssetStatus(currentFolder.TrimEnd(pathSeparator)).fileStatus);
                 }
             }
             return parentFolders;
@@ -122,13 +123,13 @@ namespace VersionControl
                         int result = EditorUtility.DisplayDialogComplex("Add Folder?", msg, "Yes", "No", "Cancel");
                         if (result == 0)
                         {
-                            MoveAssetBack(from, to);
+                            //MoveAssetBack(from, to);
                             VCCommands.Instance.Add(new[] { topUnversionedFolder });
                             VCCommands.Instance.Status(new[] { topUnversionedFolder }, StatusLevel.Local);
                         }
                         if (result == 1)
                         {
-                            VCCommands.Instance.Delete(new[] { from }, OperationMode.Force);
+                            //VCCommands.Instance.Delete(new[] { from }, OperationMode.Force);
                             return;
                         }
                         if (result == 2)
@@ -137,16 +138,21 @@ namespace VersionControl
                             return;
                         }
                     }
-                    else
-                    {
-                        MoveAssetBack(from, to);
-                    }
+                    //else
+                    //{
+                    //    MoveAssetBack(from, to);
+                    //}
                     
-                    VCCommands.Instance.Move(from, to);
+                    //VCCommands.Instance.Move(from, to);
                     AssetDatabase.Refresh();
                     GameObjectToAssetPathCache.ClearObjectToAssetPathCache();
                     
                 }
+                else
+                {
+                    MoveAssetBack(from, to);
+                }
+
             }
         }
 

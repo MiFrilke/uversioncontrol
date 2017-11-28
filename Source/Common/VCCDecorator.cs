@@ -94,7 +94,17 @@ namespace VersionControl
         {
             return vcc.Status(assets, statusLevel);
         }
-        
+
+        public string Log(string asset = "", string _strArguments = "")
+        {
+            return vcc.Log(asset, _strArguments);
+        }
+
+        public string Info()
+        {
+            return vcc.Info();
+        }
+
         public virtual bool Update(IEnumerable<string> assets = null)
         {
             return vcc.Update(assets);

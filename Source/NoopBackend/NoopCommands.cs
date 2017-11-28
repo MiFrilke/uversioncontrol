@@ -45,6 +45,15 @@ namespace VersionControl.Backend.Noop
         {
             return true;
         }
+        public string Log(string asset = "", string _strArguments = "")
+        {
+            return "";
+        }
+        public string Info()
+        {
+            return "";
+        }
+
         public virtual bool Update(IEnumerable<string> assets = null)
         {
             return true;

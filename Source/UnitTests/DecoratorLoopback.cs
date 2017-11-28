@@ -102,7 +102,17 @@ namespace VersionControl.UnitTests
         {
             return true;
         }
-        
+
+        public string Log(string asset = null, string _strArguments = "")
+        {
+            return "";
+        }
+
+        public string Info()
+        {
+            return "";
+        }
+
         public bool Update(IEnumerable<string> assets)
         {
             if (assets != null)

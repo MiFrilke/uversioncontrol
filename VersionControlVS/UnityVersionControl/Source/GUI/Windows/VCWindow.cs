@@ -13,11 +13,11 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
-using MultiColumnState = MultiColumnState<string, UnityEngine.GUIContent>;
+//using MultiColumnState = MultiColumnState<string, UnityEngine.GUIContent>;
 
 namespace VersionControl.UserInterface
 {
-    internal class VCWindow : EditorWindow
+    internal class VCWindow : EditorWindow, IHasCustomMenu
     {
         // Const
         const float toolbarHeight = 18.0f;
@@ -26,6 +26,7 @@ namespace VersionControl.UserInterface
         private readonly Color activeColor = new Color(0.8f, 0.8f, 1.0f);
 
         // State
+        private bool m_bShowUserHidden = false;
         private bool showUnversioned = true;
         private bool showMeta = true;
         private bool showModifiedNoLock = true;
@@ -46,6 +47,8 @@ namespace VersionControl.UserInterface
         private GUIStyle cancelSearchButtonStyle;
         private GUIStyle cancelSearchButtonEmptyStyle;
 
+        private string m_strHiddenOld = "";
+
         [MenuItem("Window/UVC/Overview Window %0", false, 1)]
         public static void Init()
         {
@@ -64,8 +67,22 @@ namespace VersionControl.UserInterface
             bool meta = metaStatus.fileStatus != VCFileStatus.Normal && vcStatus.fileStatus == VCFileStatus.Normal;
             bool modifiedNoLock = !projectSetting && vcStatus.ModifiedOrLocalEditAllowed();
 
-            bool rest = !unversioned && !meta && !modifiedNoLock && !projectSetting;
-            return (showUnversioned && unversioned) || (showMeta && meta) || (showModifiedNoLock && modifiedNoLock) || (showProjectSetting && projectSetting) || rest;
+            bool bHidden = false;
+            if (!string.IsNullOrEmpty(VCSettings.strHiddenFilePaths))
+            {
+                string[] arPaths = VCSettings.strHiddenFilePaths.Split(';');
+                for (int i = 0; i < arPaths.Length; i++)
+                {
+                    if (arPaths[i].Trim(new[] { ' ' }) == vcStatus.assetPath.Compose())
+                        bHidden = true;
+                }
+            }
+            bool bFitsFilter = 
+                !((!m_bShowUserHidden && bHidden) || (!showUnversioned && unversioned) || (!showMeta && meta) || (!showModifiedNoLock && modifiedNoLock) || (!showProjectSetting && projectSetting));
+
+            return bFitsFilter;
+            //bool rest = !unversioned && !meta && !modifiedNoLock && !projectSetting;
+            //return (showUnversioned && unversioned) || (showMeta && meta) || (showModifiedNoLock && modifiedNoLock) || (showProjectSetting && projectSetting) || rest;
         }
 
         // This is a performance critical function
@@ -103,7 +120,7 @@ namespace VersionControl.UserInterface
             showMeta = EditorPrefs.GetBool("VCWindow/showMeta", true);
             showModifiedNoLock = EditorPrefs.GetBool("VCWindow/showModifiedNoLock", true);
             statusHeight = EditorPrefs.GetFloat("VCWindow/statusHeight", 400.0f);
-
+            m_bShowUserHidden = EditorPrefs.GetBool("VCWindow/showHidden", false);
 
             vcMultiColumnAssetList = new VCMultiColumnAssetList();
 
@@ -124,6 +141,7 @@ namespace VersionControl.UserInterface
             EditorPrefs.SetBool("VCWindow/showMeta", showMeta);
             EditorPrefs.SetBool("VCWindow/showModifiedNoLock", showModifiedNoLock);
             EditorPrefs.SetFloat("VCWindow/statusHeight", statusHeight);
+            EditorPrefs.SetBool("VCWindow/showHidden", m_bShowUserHidden);
 
             VCCommands.Instance.StatusCompleted -= RefreshGUI;
             VCCommands.Instance.OperationCompleted -= OperationComplete;
@@ -168,18 +186,32 @@ namespace VersionControl.UserInterface
 
         private void OnGUI()
         {
+            if (VCSettings.strHiddenFilePaths != m_strHiddenOld)
+            {
+                vcMultiColumnAssetList.RefreshGUIFilter();
+                m_strHiddenOld = VCSettings.strHiddenFilePaths;
+            }
+
+
             HandleInput();
 
             EditorGUILayout.BeginVertical();
 
+            DrawInfo();
+
             DrawToolbar();
+
 
             EditorGUIUtility.AddCursorRect(rect, MouseCursor.ResizeVertical);
             rect = GUIControls.DragButton(rect, GUIContent.none, null);
             rect.x = 0.0f;
-            statusHeight = rect.y = Mathf.Clamp(rect.y, toolbarHeight, position.height - inStatusHeight);
+            //Stella 
+            rect.width = position.width;
+            statusHeight = rect.y = Mathf.Clamp(rect.y, toolbarHeight + EditorGUIUtility.singleLineHeight + 5f, position.height - inStatusHeight);
 
-            GUILayout.BeginArea(new Rect(0, toolbarHeight, position.width, rect.y - toolbarHeight));
+            Rect rectList = new Rect(0, toolbarHeight + EditorGUIUtility.singleLineHeight + 5f, position.width, rect.y - toolbarHeight);
+            GUILayout.BeginArea(rectList);
+
             vcMultiColumnAssetList.DrawGUI();
             GUILayout.EndArea();
 
@@ -269,11 +301,23 @@ namespace VersionControl.UserInterface
                     {
                         VCCommands.Instance.CommitDialog(GetSelectedAssets().ToArray(), true);
                     }
+                    if (GUILayout.Button(Terminology.log, EditorStyles.toolbarButton, buttonLayout))
+                    {
+                        UnityVersionControl.Source.GUI.Windows.VCLogWindow.showLogWindow();
+                    }
 
                     DrawSearchField();
                 }
 
                 GUILayout.FlexibleSpace();
+
+                //Stella: Hide Items
+                bool bNewShowUserHidden = GUILayout.Toggle(m_bShowUserHidden, "Hidden", EditorStyles.toolbarButton, new[] { GUILayout.MaxWidth(80) });
+                if (bNewShowUserHidden != m_bShowUserHidden)
+                {
+                    m_bShowUserHidden = bNewShowUserHidden;
+                    UpdateFilteringOfKeys();
+                }
 
                 bool newShowModifiedProjectSettings = GUILayout.Toggle(showProjectSetting, "Project Settings", EditorStyles.toolbarButton, new[] { GUILayout.MaxWidth(95) });
                 if (newShowModifiedProjectSettings != showProjectSetting)
@@ -333,6 +377,45 @@ namespace VersionControl.UserInterface
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.Separator();
             }
+        }
+
+        private string m_strRevision = "";
+        private string m_strBranch = "";
+        private void DrawInfo()
+        {
+            GUILayout.BeginHorizontal();
+
+
+            if (GUILayout.Button("Refresh", GUILayout.Width(100))|| m_strBranch == "" || m_strRevision == "")
+            {
+                string strInfo = VCCommands.Instance.Info();
+
+
+                string[] arInfoLines = strInfo.Split('\r');
+                string strDeb = "";
+                for (int i = 0; i < arInfoLines.Length; i++)
+                    strDeb += arInfoLines[i] + "   -   ";
+
+                Debug.Log(strDeb);
+
+                m_strBranch = arInfoLines[2].Split('/').Last();
+                m_strRevision = arInfoLines[6].Split(' ')[1];
+            }
+
+
+            GUILayout.Space(20);
+            GUILayout.Label("Revision: " + m_strRevision, GUILayout.Width(100));
+            GUILayout.Label("Branch: " + m_strBranch, GUILayout.Width(100));
+
+            GUILayout.EndHorizontal();
+        }
+        public void AddItemsToMenu(GenericMenu menu)
+        {
+            menu.AddItem(new GUIContent("Enabled"), VCSettings.VCEnabled, () => 
+                {
+                    commandInProgress = "";
+                    VCSettings.VCEnabled = !VCSettings.VCEnabled;
+                });
         }
 
         private void DrawSearchField()

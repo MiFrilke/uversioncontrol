@@ -50,6 +50,9 @@ namespace VersionControl
         VersionControlStatus GetAssetStatus(string assetPath);
         VersionControlStatus GetAssetStatus(ComposedString assetPath);
         IEnumerable<VersionControlStatus> GetFilteredAssets(Func<VersionControlStatus, bool> filter);
+        string Log(string asset = "", string _strArguments = "");
+        string Info();
+
         bool RequestStatus(IEnumerable<string> assets, StatusLevel statusLevel);
         bool Status(StatusLevel statusLevel, DetailLevel detailLevel);
         bool Status(IEnumerable<string> assets, StatusLevel statusLevel);

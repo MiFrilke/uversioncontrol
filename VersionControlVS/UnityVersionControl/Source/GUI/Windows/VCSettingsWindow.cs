@@ -62,7 +62,7 @@ namespace VersionControl.UserInterface
                     VCSettings.SceneviewGUI = GUILayout.Toggle(VCSettings.SceneviewGUI, new GUIContent("Scene GUI", "Show Version Control GUI in Scene view\nDefault: On"));
                     using (GUILayoutHelper.Enabled(VCSettings.SceneviewGUI, true))
                     {
-                        VCSettings.LockScenes = GUILayout.Toggle(VCSettings.SceneviewGUI && VCSettings.LockScenes, new GUIContent("GUI Lock", "Version Control allowed to lock Inspector GUI for scenes which are not " + Terminology.getlock + "\nDefault: On"), GUILayout.ExpandWidth(true), GUILayout.Width(180));
+                        VCSettings.LockScenes = GUILayout.Toggle(VCSettings.SceneviewGUI && VCSettings.LockScenes, new GUIContent("GUI Lock", "Version Control allowed to lock Inspector GUI for scenes which are not " + Terminology.getlock + "\nDefault: On"), GUILayout.ExpandWidth(true), GUILayout.Width(300));
                     }
                 }
                 using (GUILayoutHelper.Horizontal())
@@ -70,7 +70,7 @@ namespace VersionControl.UserInterface
                     VCSettings.PrefabGUI = GUILayout.Toggle(VCSettings.PrefabGUI, new GUIContent("Prefab GUI", "Show Version Control GUI for prefabs in hierarchy view\nDefault: On"));
                     using (GUILayoutHelper.Enabled(VCSettings.PrefabGUI, true))
                     {
-                        VCSettings.LockPrefabs = GUILayout.Toggle(VCSettings.LockPrefabs && VCSettings.PrefabGUI, new GUIContent("GUI Lock", "Version Control allowed to lock Inspector GUI for prefabs which are not " + Terminology.getlock + "\nDefault: Off"), GUILayout.ExpandWidth(true), GUILayout.Width(180));
+                        VCSettings.LockPrefabs = GUILayout.Toggle(VCSettings.LockPrefabs && VCSettings.PrefabGUI, new GUIContent("GUI Lock", "Version Control allowed to lock Inspector GUI for prefabs which are not " + Terminology.getlock + "\nDefault: Off"), GUILayout.ExpandWidth(true), GUILayout.Width(300));
                     }
                 }
                 using (GUILayoutHelper.Horizontal())
@@ -78,7 +78,7 @@ namespace VersionControl.UserInterface
                     VCSettings.MaterialGUI = GUILayout.Toggle(VCSettings.MaterialGUI, new GUIContent("Material GUI", "Show Version Control GUI for material interaction on the Renderer inspector\nDefault: On"));
                     using (GUILayoutHelper.Enabled(VCSettings.MaterialGUI, true))
                     {
-                        VCSettings.LockMaterials = GUILayout.Toggle(VCSettings.MaterialGUI && VCSettings.LockMaterials, new GUIContent("GUI Lock", "Version Control allowed to lock Inspector GUI for materials which are not " + Terminology.getlock + "\nDefault: On"), GUILayout.ExpandWidth(true), GUILayout.Width(180));
+                        VCSettings.LockMaterials = GUILayout.Toggle(VCSettings.MaterialGUI && VCSettings.LockMaterials, new GUIContent("GUI Lock", "Version Control allowed to lock Inspector GUI for materials which are not " + Terminology.getlock + "\nDefault: On"), GUILayout.ExpandWidth(true), GUILayout.Width(300));
                     }
                 }
             }
@@ -96,17 +96,17 @@ namespace VersionControl.UserInterface
                         using (GUILayoutHelper.Horizontal())
                         {
                             GUILayout.Label(new GUIContent("Scenes", "The Inspector GUI locks will only be active on assetpaths that contains the following filter.\neg. assets/scenes/"));
-                            VCSettings.LockScenesFilter = EditorGUILayout.TextField(VCSettings.LockScenesFilter, GUILayout.ExpandWidth(true), GUILayout.Width(180));
+                            VCSettings.LockScenesFilter = EditorGUILayout.TextField(VCSettings.LockScenesFilter, GUILayout.ExpandWidth(true), GUILayout.Width(300));
                         }
                         using (GUILayoutHelper.Horizontal())
                         {
                             GUILayout.Label(new GUIContent("Prefabs", "The Inspector GUI locks will only be active on assetpaths that contains the following filter.\neg. assets/prefabs/"));
-                            VCSettings.LockPrefabsFilter = EditorGUILayout.TextField(VCSettings.LockPrefabsFilter, GUILayout.ExpandWidth(true), GUILayout.Width(180));
+                            VCSettings.LockPrefabsFilter = EditorGUILayout.TextField(VCSettings.LockPrefabsFilter, GUILayout.ExpandWidth(true), GUILayout.Width(300));
                         }
                         using (GUILayoutHelper.Horizontal())
                         {
                             GUILayout.Label(new GUIContent("Materials", "The Inspector GUI locks will only be active on assetpaths that contains the following filter.\neg. assets/materials/"));
-                            VCSettings.LockMaterialsFilter = EditorGUILayout.TextField(VCSettings.LockMaterialsFilter, GUILayout.ExpandWidth(true), GUILayout.Width(180));
+                            VCSettings.LockMaterialsFilter = EditorGUILayout.TextField(VCSettings.LockMaterialsFilter, GUILayout.ExpandWidth(true), GUILayout.Width(300));
                         }
                     }
                 }
@@ -124,12 +124,12 @@ namespace VersionControl.UserInterface
                 using (GUILayoutHelper.Horizontal())
                 {
                     VCSettings.HierarchyIcons = GUILayout.Toggle(VCSettings.HierarchyIcons, new GUIContent("Hierachy Icons", "Show Version Control controls in hierachy view\nDefault: On"));
-                    VCSettings.HierarchyReflectionMode = (VCSettings.EReflectionLevel)EditorGUILayout.EnumPopup(VCSettings.HierarchyReflectionMode, GUILayout.ExpandWidth(true), GUILayout.Width(180));
+                    VCSettings.HierarchyReflectionMode = (VCSettings.EReflectionLevel)EditorGUILayout.EnumPopup(VCSettings.HierarchyReflectionMode, GUILayout.ExpandWidth(true), GUILayout.Width(300));
                 }
                 using (GUILayoutHelper.Horizontal())
                 {
                     VCSettings.ProjectIcons = GUILayout.Toggle(VCSettings.ProjectIcons, new GUIContent("Project Icons", "Show Version Control controls in project view\nDefault: On"));
-                    VCSettings.ProjectReflectionMode = (VCSettings.EReflectionLevel)EditorGUILayout.EnumPopup(VCSettings.ProjectReflectionMode, GUILayout.ExpandWidth(true), GUILayout.Width(180));
+                    VCSettings.ProjectReflectionMode = (VCSettings.EReflectionLevel)EditorGUILayout.EnumPopup(VCSettings.ProjectReflectionMode, GUILayout.ExpandWidth(true), GUILayout.Width(300));
                 }
             }
 
@@ -147,7 +147,7 @@ namespace VersionControl.UserInterface
                 using (GUILayoutHelper.Horizontal())
                 {
                     VCSettings.BugReport = GUILayout.Toggle(VCSettings.BugReport, new GUIContent("Bug Reports", "Send a bug report to Fogbugz when an error occurs\nDefault: On"));
-                    VCSettings.BugReportMode = (VCSettings.EBugReportMode)EditorGUILayout.EnumPopup(VCSettings.BugReportMode, GUILayout.ExpandWidth(true), GUILayout.Width(180));
+                    VCSettings.BugReportMode = (VCSettings.EBugReportMode)EditorGUILayout.EnumPopup(VCSettings.BugReportMode, GUILayout.ExpandWidth(true), GUILayout.Width(300));
                 }
                 VCSettings.Analytics = GUILayout.Toggle(VCSettings.Analytics, new GUIContent("Analytics", "Allow UVC to send anonymous analytics data with the purpose of improving the quality of UVC\nDefault: On"));
                 VCSettings.Logging = GUILayout.Toggle(VCSettings.Logging, new GUIContent("Logging", "Output logs from Version Control to Unity console\nDefault: Off"));
@@ -158,12 +158,12 @@ namespace VersionControl.UserInterface
                 using (GUILayoutHelper.Horizontal())
                 {
                     GUILayout.Label(new GUIContent("How to Move and Rename", "How should file move and renames in project be handled\nDefault: Simple"));
-                    VCSettings.HandleFileMove = (VCSettings.EHandleFileMove)EditorGUILayout.EnumPopup(VCSettings.HandleFileMove, GUILayout.ExpandWidth(true), GUILayout.Width(180));
+                    VCSettings.HandleFileMove = (VCSettings.EHandleFileMove)EditorGUILayout.EnumPopup(VCSettings.HandleFileMove, GUILayout.ExpandWidth(true), GUILayout.Width(300));
                 }
                 using (GUILayoutHelper.Horizontal())
                 {
                     GUILayout.Label(new GUIContent(string.Format("Who Controls Asset Saves", Terminology.getlock), string.Format("Select {0} to only let Unity save files that are either {1} or {2} \nDefault: {3}", VCSettings.ESaveAssetsStrategy.VersionControl.ToString(), Terminology.allowLocalEdit, Terminology.getlock, VCSettings.ESaveAssetsStrategy.Unity.ToString())));
-                    VCSettings.SaveStrategy = (VCSettings.ESaveAssetsStrategy)EditorGUILayout.EnumPopup(VCSettings.SaveStrategy, GUILayout.ExpandWidth(true), GUILayout.Width(180));
+                    VCSettings.SaveStrategy = (VCSettings.ESaveAssetsStrategy)EditorGUILayout.EnumPopup(VCSettings.SaveStrategy, GUILayout.ExpandWidth(true), GUILayout.Width(300));
                 }
                 if (clientPath == null) clientPath = VCSettings.ClientPath;
                 var textColor = ValidCommandLineClient(clientPath) ? new Color(0.0f, 0.6f, 0.0f) : new Color(0.6f, 0.0f, 0.0f);
@@ -171,13 +171,32 @@ namespace VersionControl.UserInterface
                 using (GUILayoutHelper.Horizontal())
                 {
                     GUILayout.Label(new GUIContent("Environment Path", "Specify the path to a command line client. eg MacPorts SVN : /opt/local/bin/\nDefault: <Empty>"));
-                    clientPath = EditorGUILayout.TextField(clientPath, textStyle, GUILayout.ExpandWidth(true), GUILayout.Width(180)).Trim(new[] { ' ' }).Replace('\\', '/');
+                    clientPath = EditorGUILayout.TextField(clientPath, textStyle, GUILayout.ExpandWidth(true), GUILayout.Width(300)).Trim(new[] { ' ' }).Replace('\\', '/');
                 }
                 if (ValidCommandLineClient(clientPath)) VCSettings.ClientPath = clientPath;
                 using (GUILayoutHelper.Horizontal())
                 {
                     GUILayout.Label(new GUIContent("Version Control System", "The selected Version Control will be used if a valid local copy can be found"));
-                    VCSettings.VersionControlBackend = (VCSettings.EVersionControlBackend)EditorGUILayout.EnumPopup(VCSettings.VersionControlBackend, GUILayout.ExpandWidth(true), GUILayout.Width(180));
+                    VCSettings.VersionControlBackend = (VCSettings.EVersionControlBackend)EditorGUILayout.EnumPopup(VCSettings.VersionControlBackend, GUILayout.ExpandWidth(true), GUILayout.Width(300));
+                }
+            }
+            GUILayout.Label("Other", EditorStyles.boldLabel);
+            using (GUILayoutHelper.VerticalIdented(14))
+            {
+                using (GUILayoutHelper.Horizontal())
+                {
+                    var textColor = bValidHiddenPathsString(VCSettings.strHiddenFilePaths) ? new Color(0.0f, 0.6f, 0.0f) : new Color(0.6f, 0.0f, 0.0f);
+                    var textStyle = new GUIStyle(EditorStyles.textField) { normal = { textColor = textColor } };
+                    GUILayout.Label(new GUIContent("Hidden paths", "Specify the paths to a hide items from the overview. Seperate paths with a semicolon."));
+                    VCSettings.strHiddenFilePaths = EditorGUILayout.TextField(VCSettings.strHiddenFilePaths, textStyle, GUILayout.ExpandWidth(true), GUILayout.Width(300)).Trim(new[] { ' ' }).Replace('\\', '/');
+                }
+
+                using (GUILayoutHelper.Horizontal())
+                {
+                    var textColor = bValidAutocompleteString(VCSettings.strCommitAutoComplete) ? new Color(0.0f, 0.6f, 0.0f) : new Color(0.6f, 0.0f, 0.0f);
+                    var textStyle = new GUIStyle(EditorStyles.textField) { normal = { textColor = textColor } };
+                    GUILayout.Label(new GUIContent("Commit autocompletes", "Specify autocomplete suggestions for commit message. Format text->suggestion. Seperate suggestions with a semicolon."));
+                    VCSettings.strCommitAutoComplete = EditorGUILayout.TextField(VCSettings.strCommitAutoComplete, textStyle, GUILayout.ExpandWidth(true), GUILayout.Width(300)).Trim(new[] { ' ' }).Replace('\\', '/');
                 }
             }
             EditorGUILayout.EndScrollView();
@@ -186,6 +205,41 @@ namespace VersionControl.UserInterface
         static bool ValidCommandLineClient(string path)
         {
             return string.IsNullOrEmpty(path) || Directory.Exists(path);
+        }
+
+        static bool bValidAutocompleteString(string _strAutocomplete)
+        {
+            if (string.IsNullOrEmpty(_strAutocomplete))
+                return true;
+
+            string[] arSuggestions = _strAutocomplete.Split(';');
+            for (int i = 0; i < arSuggestions.Length; i++)
+            {
+                string strSuggestion = arSuggestions[i].Trim(new[] { ' ' });
+
+                string[] strSuggestionParts = strSuggestion.Split(new string[] { "->" }, StringSplitOptions.RemoveEmptyEntries);
+                if (strSuggestionParts.Length != 2)
+                    return false;
+            }
+
+            return true;
+
+        }
+
+        static bool bValidHiddenPathsString(string _strHiddenPahts)
+        {
+            if (string.IsNullOrEmpty(_strHiddenPahts))
+                return true;
+
+            string[] arPaths = _strHiddenPahts.Split(';');
+            for (int i = 0; i < arPaths.Length; i++)
+            {
+                string strPath = arPaths[i].Trim(new[] { ' ' });
+                if (!string.IsNullOrEmpty(strPath) && (AssetDatabase.AssetPathToGUID(strPath) == "") && !AssetDatabase.IsValidFolder(strPath))
+                    return false;                
+            }
+
+            return true;
         }
     }
 }

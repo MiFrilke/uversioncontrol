@@ -82,14 +82,26 @@ namespace VersionControl
 
         private static bool ShouleBeEditable(GameObject gameObject)
         {
+            //Debug.Log(gameObject.name + " - " + 
+            //    gameObject.GetAssetPath() + " - " + 
+            //    VCUtility.ManagedByRepository(gameObject.GetAssetStatus()) +  " - " +
+            //    ObjectUtilities.ChangesStoredInPrefab(gameObject) + " - " +
+            //    LockPrefab(gameObject.GetAssetPath()) + " - " +
+            //    VCUtility.HaveAssetControl(gameObject.GetAssetStatus()) + " - " +
+            //    ObjectUtilities.ObjectToAssetPath(gameObject, false) + " - " +
+            //    PrefabUtility.GetPrefabType(gameObject).ToString());
+
             var assetPath = gameObject.GetAssetPath();
             if (assetPath == "") return true;
             var assetStatus = gameObject.GetAssetStatus();
             if (!VCUtility.ManagedByRepository(assetStatus)) return true;
             bool isPrefab = ObjectUtilities.ChangesStoredInPrefab(gameObject);
-            if (isPrefab && LockPrefab(assetPath))
+            if (isPrefab)
             {
-                return VCUtility.HaveAssetControl(assetStatus);
+                if (LockPrefab(assetPath))
+                    return VCUtility.HaveAssetControl(assetStatus);
+                else //Stella: if not-locked prefab, allow editing even though this might affect scene
+                    return true;
             }
             else // Treat as scene object
             {

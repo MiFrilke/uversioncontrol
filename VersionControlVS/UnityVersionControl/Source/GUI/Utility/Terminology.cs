@@ -19,5 +19,6 @@ namespace VersionControl
         public const string diff = "Diff";
         public const string refresh = "Refresh";
         public const string localModified = "Local Modified";
+        public const string log = "Log";
     }
 }

@@ -76,10 +76,12 @@
     <Compile Include="Source\GUI\Windows\VCBugReportWindow.cs" />
     <Compile Include="Source\GUI\Windows\VCCommitWindow.cs" />
     <Compile Include="Source\GUI\Windows\VCCredentialsWindow.cs" />
+    <Compile Include="Source\GUI\Windows\VCLogWindow.cs" />
     <Compile Include="Source\GUI\Windows\VCSettingsWindow.cs" />
     <Compile Include="Source\GUI\Windows\VCWindow.cs" />
     <Compile Include="Source\MultiColumnListView\MultiColumnState.cs" />
     <Compile Include="Source\MultiColumnListView\MultiColumnView.cs" />
+    <Compile Include="Source\MultiColumnListView\VCTreeView.cs" />
     <Compile Include="Source\UnityHooks\VCRefreshEditable.cs" />
     <Compile Include="Source\UnityHooks\VCRefreshOnNewAsset.cs" />
     <Compile Include="Source\Utility\AnalyticsEvents.cs" />

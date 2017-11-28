@@ -727,6 +727,16 @@ namespace VersionControl.Backend.P4
             return true;
         }
 
+        public string Log(string asset = "", string _strArguments = "")
+        {
+            return "";
+        }
+
+        public string Info()
+        {
+            return "";
+        }
+
         public bool Update(IEnumerable<string> assets = null)
         {
             if (assets == null || !assets.Any()) assets = new[] { P4Util.Instance.Vars.workingDirectory };

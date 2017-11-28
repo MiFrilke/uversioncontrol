@@ -97,6 +97,27 @@ namespace VersionControl.UserInterface
 
         public static void CreateVCContextMenu(ref GenericMenu menu, IEnumerable<string> assetPaths)
         {
+            bool bHidden = false; ;
+            bool bSet = false;
+            bool bEqual = true;
+            foreach (string strPath in assetPaths)
+            {
+                if (!bSet)
+                {
+                    bHidden = VCSettings.bHidden(strPath);
+                }
+                else if (bHidden != VCSettings.bHidden(strPath))
+                    bEqual = false;
+            }
+            if (bEqual)
+            {
+                if (bHidden)
+                    menu.AddItem(new GUIContent("Unhide"), false, () => VCSettings.removeHidden(assetPaths));
+                else
+                    menu.AddItem(new GUIContent("Hide"), false, () => VCSettings.addHidden(assetPaths));
+            }
+
+            menu.AddItem(new GUIContent(Terminology.log), false, () => UnityVersionControl.Source.GUI.Windows.VCLogWindow.showLogWindow(assetPaths));
             menu.AddItem(new GUIContent(Terminology.add), false, () => VCCommands.Instance.Add(assetPaths));
             menu.AddItem(new GUIContent(Terminology.getlock), false, () => VCCommands.Instance.GetLock(assetPaths));
             menu.AddItem(new GUIContent(Terminology.commit), false, () => VCCommands.Instance.CommitDialog(assetPaths));
@@ -106,7 +127,7 @@ namespace VersionControl.UserInterface
 
         public struct ValidActions
         {
-            public bool showAdd, showOpen, showDiff, showCommit, showRevert, showDelete, showOpenLocal, showUnlock, showUpdate, showForceOpen, showDisconnect;
+            public bool showLog, showAdd, showOpen, showDiff, showCommit, showRevert, showDelete, showOpenLocal, showUnlock, showUpdate, showForceOpen, showDisconnect;
         }
 
         public static ValidActions GetValidActions(string assetPath, Object instance = null)
@@ -135,6 +156,7 @@ namespace VersionControl.UserInterface
             bool allowLocalEdit = assetStatus.LocalEditAllowed();
             bool pending = assetStatus.reflectionLevel == VCReflectionLevel.Pending;
 
+            validActions.showLog        = !pending && !ignored && !unversioned;
             validActions.showAdd        = !pending && !ignored && unversioned;
             validActions.showOpen       = !pending && !validActions.showAdd && !added && !haveLock && !deleted && !isFolder && !mergableAsset && (!lockedByOther || allowLocalEdit);
             validActions.showDiff       = !pending && !ignored && !deleted && modifiedDiffableAsset && managedByRep;
@@ -159,8 +181,15 @@ namespace VersionControl.UserInterface
                 {
                     var assetStatus = VCCommands.Instance.GetAssetStatus(assetPath);
                     if (instance && ObjectUtilities.ChangesStoredInScene(instance)) assetPath = SceneManagerUtilities.GetCurrentScenePath();
-                    var validActions = GetValidActions(assetPath, instance);                    
+                    var validActions = GetValidActions(assetPath, instance);
 
+                    if (VCSettings.bHidden(assetPath))
+                        menu.AddItem(new GUIContent("Unhide"), false, () => VCSettings.removeHidden(assetPath));
+                    else
+                        menu.AddItem(new GUIContent("Hide"), false, () => VCSettings.addHidden(assetPath));
+
+
+                    if (validActions.showLog)       menu.AddItem(new GUIContent(Terminology.log),               false, () => UnityVersionControl.Source.GUI.Windows.VCLogWindow.showLogWindow(new[] { assetPath }));
                     if (validActions.showDiff)      menu.AddItem(new GUIContent(Terminology.diff),              false, () => VCUtility.DiffWithBase(assetPath));
                     if (validActions.showAdd)       menu.AddItem(new GUIContent(Terminology.add),               false, () => VCCommands.Instance.Add(new[] { assetPath }));
                     if (validActions.showOpen)      menu.AddItem(new GUIContent(Terminology.getlock),           false, () => GetLock(assetPath, instance));

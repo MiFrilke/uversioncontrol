@@ -81,7 +81,7 @@ namespace VersionControl
 
         private static bool HasInternet()
         {
-            return Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork && !Application.isWebPlayer;
+            return Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork/* && !Application.isWebPlayer*/;
         }
 
         private static void SendRequest(string page, string pageTitle, string category, string action, string label, int? value)

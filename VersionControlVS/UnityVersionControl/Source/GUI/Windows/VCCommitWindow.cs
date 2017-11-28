@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
-using MultiColumnState = MultiColumnState<string, UnityEngine.GUIContent>;
+//using MultiColumnState = MultiColumnState<string, UnityEngine.GUIContent>;
 
 namespace VersionControl.UserInterface
 {
@@ -74,14 +74,7 @@ namespace VersionControl.UserInterface
 
         private void RefreshSelection()
         {
-            if (VCSettings.SelectiveCommit)
-            {
-                vcMultiColumnAssetList.ForEachRow(r => vcMultiColumnAssetList.SetMasterSelection(r.data, VCSettings.IncludeDepedenciesAsDefault || assetPaths.Contains(r.data.assetPath)));
-            }
-            else
-            {
-                vcMultiColumnAssetList.ForEachRow(r => r.selected = VCSettings.IncludeDepedenciesAsDefault || assetPaths.Contains(r.data.assetPath));
-            }
+            vcMultiColumnAssetList.refreshSelection(assetPaths);
             Repaint();
         }
 
@@ -90,7 +83,7 @@ namespace VersionControl.UserInterface
             minSize  = new Vector2(1000, 400);
             commitMessageHeight = EditorPrefs.GetFloat("VCCommitWindow/commitMessageHeight", 140.0f);
             rect = new Rect(0, commitMessageHeight, position.width, 10.0f);
-            vcMultiColumnAssetList = new VCMultiColumnAssetList(Repaint, VCSettings.SelectiveCommit);
+            vcMultiColumnAssetList = new VCMultiColumnAssetList(Repaint, /*VCSettings.SelectiveCommit*/ true);
             VCCommands.Instance.StatusCompleted += RefreshSelection;
         }
 
@@ -145,24 +138,54 @@ namespace VersionControl.UserInterface
         {
             EditorGUILayout.BeginHorizontal();
 
-            GUI.SetNextControlName("CommitMessage");
             using (GUILayoutHelper.BackgroundColor(CommitMessage.Length < 10 ? new Color(1, 0, 0) : new Color(0, 1, 0)))
             {
                 statusScroll = EditorGUILayout.BeginScrollView(statusScroll, false, false);
-                CommitMessage = EditorGUILayout.TextArea(CommitMessage, GUILayout.MinWidth(100), GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+                string strCommitMessageOld = CommitMessage;
+
+                    CommitMessage = EditorGUILayout.TextArea(CommitMessage, GUILayout.MinWidth(100), GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+
+                if (CommitMessage.Length > strCommitMessageOld.Length)
+                {
+                    if (!string.IsNullOrEmpty(VCSettings.strCommitAutoComplete))
+                    {
+
+                        string[] arSuggestions = VCSettings.strCommitAutoComplete.Split(';');
+                        for (int i = 0; i < arSuggestions.Length; i++)
+                        {
+                            string strSuggestion = arSuggestions[i].Trim(new[] { ' ' });
+                            string[] strSuggestionParts = strSuggestion.Split(new string[] { "->" }, System.StringSplitOptions.RemoveEmptyEntries);
+
+                            if (CommitMessage.EndsWith(strSuggestionParts[0]))
+                            {
+                                TextEditor editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl);
+
+                                CommitAutoCompleteSuggestion suggestion = new CommitAutoCompleteSuggestion(strSuggestionParts[0].Length, strSuggestionParts[1], this);
+
+                                editor.DetectFocusChange();
+                                editor.OnLostFocus();
+
+                                PopupWindow.Show(new Rect((editor.graphicalSelectCursorPos), suggestion.GetWindowSize()), suggestion);
+                            }
+                        }
+
+                    }
+                }
                 EditorGUILayout.EndScrollView();
             }
             if (firstTime)
             {
-                GUI.FocusControl("CommitMessage");
+                EditorGUI.FocusTextInControl("CommitMessage");
                 firstTime = false;
             }
+
 
             using (new PushState<bool>(GUI.enabled, VCCommands.Instance.Ready, v => GUI.enabled = v))
             {
                 if (GUILayout.Button(Terminology.commit, GUILayout.Width(100)))
                 {
-                    var selection = VCSettings.SelectiveCommit ? vcMultiColumnAssetList.GetMasterSelection() : vcMultiColumnAssetList.GetSelection();
+                    var selection = //VCSettings.SelectiveCommit ? vcMultiColumnAssetList.GetMasterSelection() : vcMultiColumnAssetList.GetSelection();
+                        vcMultiColumnAssetList.GetCommitSelection(VCSettings.SelectiveCommit);
                     if (selection.Count() != 0)
                     {                        
                         var selectedAssets = selection.Select(status => status.assetPath).Select(cstr => cstr.Compose()).ToList();
@@ -205,6 +228,57 @@ namespace VersionControl.UserInterface
             {
                 RemoveNotification();
             }
+
+            GUI.SetNextControlName("unfocus");
+        }
+
+        public void suggesitonInput(int _iOriginalLength = 0, string _strSuggestion = "")
+        {
+            if (_strSuggestion != "")
+            {
+                CommitMessage = CommitMessage.Substring(0, CommitMessage.Length - _iOriginalLength) + _strSuggestion;
+
+                GUIUtility.hotControl = 0;
+                GUIUtility.keyboardControl = 0;
+                GUI.FocusControl("unfocus");
+                EditorGUI.FocusTextInControl("unfocus");
+
+                Repaint();
+            }
+        }
+    }
+
+    internal class CommitAutoCompleteSuggestion : PopupWindowContent
+    {
+        public const string c_strWarning = "de/resel!";
+
+        private string m_strSuggestion;
+        private int m_iOriginalLength;
+        private VCCommitWindow m_window;
+
+
+        private bool bAccepted;
+        public CommitAutoCompleteSuggestion(int _iOriginalLength, string _strSuggestion, VCCommitWindow _window)
+        { m_strSuggestion = _strSuggestion; m_iOriginalLength = _iOriginalLength; m_window = _window; }
+
+        public override void OnGUI(Rect rect)
+        {
+            if (bAccepted)
+            {
+                GUI.Label(rect, c_strWarning);
+            }
+            else
+            {
+                if ((GUI.Button(rect, m_strSuggestion, GUI.skin.label)) || (Event.current.type == EventType.keyDown && (Event.current.keyCode == KeyCode.KeypadEnter || Event.current.keyCode == KeyCode.Return)))
+                { m_window.suggesitonInput(m_iOriginalLength, m_strSuggestion); bAccepted = true; editorWindow.Repaint(); }
+                else if (Event.current.type == EventType.mouseDown || Event.current.type == EventType.mouseUp || Event.current.type == EventType.KeyDown)
+                { m_window.suggesitonInput(); if (m_window) m_window.Focus(); else this.editorWindow.Close(); }
+            }
+        }
+
+        public override Vector2 GetWindowSize()
+        {
+            return new Vector2(8.5f * Mathf.Max(m_strSuggestion.Length, c_strWarning.Length), EditorGUIUtility.singleLineHeight);
         }
     }
 }

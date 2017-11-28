@@ -40,6 +40,8 @@ namespace VersionControl
             saveStrategy = (ESaveAssetsStrategy)EditorPrefs.GetInt("VCSSettings/saveStrategy", (int)ESaveAssetsStrategy.Unity);
             versionControlBackend = (EVersionControlBackend)EditorPrefs.GetInt("VCSSettings/versionControlBackend", (int)EVersionControlBackend.None);
             handleFileMove = (EHandleFileMove)EditorPrefs.GetInt("VCSSettings/handleFileMove", (int)EHandleFileMove.Simple);
+            s_strHiddenFilePaths = EditorPrefs.GetString("VCSSettings/hiddenFilePaths", "");
+            s_strCommitAutoComplete = EditorPrefs.GetString("VCSSettings/commitAutoComplete", "");
 
             OnSettingsChanged();
 
@@ -71,6 +73,8 @@ namespace VersionControl
                 EditorPrefs.SetInt("VCSSettings/saveStrategy", (int)saveStrategy);
                 EditorPrefs.SetInt("VCSSettings/versionControlBackend", (int)versionControlBackend);
                 EditorPrefs.SetInt("VCSSettings/handleFileMove", (int)handleFileMove);
+                EditorPrefs.SetString("VCSSettings/hiddenFilePaths", s_strHiddenFilePaths);
+                EditorPrefs.SetString("VCSSettings/commitAutoComplete", s_strCommitAutoComplete);
             };
         }
 
@@ -217,6 +221,64 @@ namespace VersionControl
         private static EHandleFileMove handleFileMove;
         public static EHandleFileMove HandleFileMove { get { return handleFileMove; } set { if (handleFileMove != value) { handleFileMove = value; OnSettingsChanged(); } } }
 
+        private static string s_strCommitAutoComplete;
+        public static string strCommitAutoComplete { get { return s_strCommitAutoComplete; } set { if (s_strCommitAutoComplete != value) { s_strCommitAutoComplete = value.TrimStart(new[] { ' ', '/' }); } } }
+
+        private static string s_strHiddenFilePaths;
+        public static string strHiddenFilePaths { get { return s_strHiddenFilePaths; } set { if (s_strHiddenFilePaths != value) { s_strHiddenFilePaths = value.TrimStart(new[] { ' ', '/' }); } } }
+
+        public static bool bHidden(string _strPath)
+        {
+            bool bHidden = false;
+            if (!string.IsNullOrEmpty(strHiddenFilePaths))
+            {
+                string[] arPaths = strHiddenFilePaths.Split(';');
+                for (int i = 0; i < arPaths.Length; i++)
+                {
+                    if (arPaths[i].Trim(new[] { ' ' }) == _strPath)
+                        bHidden = true;
+                }
+            }
+            return bHidden;
+        }
+
+        public static void addHidden(string _strPath)
+        {
+            strHiddenFilePaths += "; " + _strPath;
+        }
+
+        public static void addHidden(System.Collections.Generic.IEnumerable<string> assetPaths)
+        {
+            foreach (string strPath in assetPaths)
+                addHidden(strPath);
+        }
+
+        public static void removeHidden(string _strPath)
+        {
+            int iRemoved = -1;
+            if (!string.IsNullOrEmpty(strHiddenFilePaths))
+            {
+                string[] arPaths = strHiddenFilePaths.Split(';');
+                for (int i = 0; i < arPaths.Length; i++)
+                {
+                    if (arPaths[i].Trim(new[] { ' ' }) == _strPath)
+                        iRemoved = i;
+                }
+
+
+                if (iRemoved >= 0)
+                {
+                    strHiddenFilePaths = String.Join(";", arPaths, 0, iRemoved);
+                    strHiddenFilePaths += String.Join(";", arPaths, iRemoved+1, arPaths.Length - iRemoved -1);
+                }
+            }
+        }
+
+        public static void removeHidden(System.Collections.Generic.IEnumerable<string> assetPaths)
+        {
+            foreach (string strPath in assetPaths)
+                removeHidden(strPath);
+        }
 
         private static string clientPath;
         public static string ClientPath

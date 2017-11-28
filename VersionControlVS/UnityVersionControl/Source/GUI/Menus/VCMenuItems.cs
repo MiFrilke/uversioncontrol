@@ -98,8 +98,44 @@ namespace VersionControl
         {
             VCCommands.Instance.Add(GetAssetPathsOfSelected().ToArray());
         }
-        
-        [MenuItem("Assets/UVC/" + Terminology.update)]
+
+        // Log
+        [MenuItem("Assets/UVC/" + Terminology.log)]
+        public static void VCLogProjectContext()
+        {
+            UnityVersionControl.Source.GUI.Windows.VCLogWindow.showLogWindow(GetAssetPathsOfSelected().ToArray());
+        }
+
+        // Log
+        [MenuItem("Assets/UVC/" + "Toggle Hidden")]
+        public static void VCToggleHiddenContext()
+        {
+            IEnumerable<string> assetPaths = GetAssetPathsOfSelected();
+
+            bool bHidden = false; ;
+            bool bSet = false;
+            bool bEqual = true;
+            foreach (string strPath in assetPaths)
+            {
+                if (!bSet)
+                {
+                    bHidden = VCSettings.bHidden(strPath);
+                }
+                else if (bHidden != VCSettings.bHidden(strPath))
+                    bEqual = false;
+            }
+            if (bEqual)
+            {
+                if (bHidden)
+                    VCSettings.removeHidden(assetPaths);
+                else
+                   VCSettings.addHidden(assetPaths);
+            }
+        }
+
+
+        //Stella: Unity Update bug
+        //[MenuItem("Assets/UVC/" + Terminology.update)]
         public static void VCUpdateSelection()
         {
             VCCommands.Instance.Update(GetAssetPathsOfSelected().ToArray());
