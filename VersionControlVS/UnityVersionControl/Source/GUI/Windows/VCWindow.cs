@@ -131,6 +131,8 @@ namespace VersionControl.UserInterface
             VCCommands.Instance.OperationCompleted += OperationComplete;
             VCCommands.Instance.ProgressInformation += ProgressInformation;
             VCSettings.SettingChanged += Repaint;
+            VCSettings.SettingChanged += RefreshInfo;
+            RefreshInfo();
 
             rect = new Rect(0, statusHeight, position.width, 40.0f);
         }
@@ -147,6 +149,8 @@ namespace VersionControl.UserInterface
             VCCommands.Instance.OperationCompleted -= OperationComplete;
             VCCommands.Instance.ProgressInformation -= ProgressInformation;
             VCSettings.SettingChanged -= Repaint;
+            VCSettings.SettingChanged -= RefreshInfo;
+
 
             vcMultiColumnAssetList.Dispose();
             if (updateInProgress) EditorUtility.ClearProgressBar();
@@ -207,9 +211,9 @@ namespace VersionControl.UserInterface
             rect.x = 0.0f;
             //Stella 
             rect.width = position.width;
-            statusHeight = rect.y = Mathf.Clamp(rect.y, toolbarHeight + EditorGUIUtility.singleLineHeight + 5f, position.height - inStatusHeight);
+            statusHeight = rect.y = Mathf.Clamp(rect.y, toolbarHeight + EditorGUIUtility.singleLineHeight, position.height - inStatusHeight);
 
-            Rect rectList = new Rect(0, toolbarHeight + EditorGUIUtility.singleLineHeight + 5f, position.width, rect.y - toolbarHeight);
+            Rect rectList = new Rect(0, toolbarHeight + EditorGUIUtility.singleLineHeight + 5f, position.width, rect.y - toolbarHeight - EditorGUIUtility.singleLineHeight);
             GUILayout.BeginArea(rectList);
 
             vcMultiColumnAssetList.DrawGUI();
@@ -254,6 +258,24 @@ namespace VersionControl.UserInterface
                 refreshInProgress = false;
                 RefreshGUI();
             });
+
+            RefreshInfo();
+        }
+
+        private void RefreshInfo()
+        {
+            string strInfo = VCCommands.Instance.Info();
+
+            string[] arInfoLines = strInfo.Split('\r');
+
+            if (arInfoLines.Length < 7)
+            {
+                m_strBranch = m_strRevision = "";
+                return;
+            }
+
+            m_strBranch = arInfoLines[2].Split('/').Last();
+            m_strRevision = arInfoLines[6].Split(' ')[1];
         }
 
         private void DrawToolbar()
@@ -372,6 +394,7 @@ namespace VersionControl.UserInterface
                     {
                         commandInProgress = "";
                         VCSettings.VCEnabled = !VCSettings.VCEnabled;
+                        RefreshStatus();
                     }
                 }
                 EditorGUILayout.EndHorizontal();
@@ -385,24 +408,6 @@ namespace VersionControl.UserInterface
         {
             GUILayout.BeginHorizontal();
 
-
-            if (GUILayout.Button("Refresh", GUILayout.Width(100))|| m_strBranch == "" || m_strRevision == "")
-            {
-                string strInfo = VCCommands.Instance.Info();
-
-
-                string[] arInfoLines = strInfo.Split('\r');
-                string strDeb = "";
-                for (int i = 0; i < arInfoLines.Length; i++)
-                    strDeb += arInfoLines[i] + "   -   ";
-
-                Debug.Log(strDeb);
-
-                m_strBranch = arInfoLines[2].Split('/').Last();
-                m_strRevision = arInfoLines[6].Split(' ')[1];
-            }
-
-
             GUILayout.Space(20);
             GUILayout.Label("Revision: " + m_strRevision, GUILayout.Width(100));
             GUILayout.Label("Branch: " + m_strBranch, GUILayout.Width(100));
@@ -415,6 +420,7 @@ namespace VersionControl.UserInterface
                 {
                     commandInProgress = "";
                     VCSettings.VCEnabled = !VCSettings.VCEnabled;
+                    RefreshStatus();
                 });
         }
 

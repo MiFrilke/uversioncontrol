@@ -501,33 +501,26 @@ namespace VersionControl.Backend.SVN
             return true;
         }
 
-        private string m_strLogCache;
         public string Log(string asset = "", string _strArguments = "")
         {
-            m_strLogCache = "";
-            ProgressInformation += buildLogProgressString;
-
-            CreateOperation("log " + (asset == "" ? "" : (PrepareAssetPath(asset))) + " " + _strArguments);
-
-            ProgressInformation -= buildLogProgressString;
-            return m_strLogCache;
+            var svnLog = CreateSVNCommandLine("log " + (asset == "" ? "" : (PrepareAssetPath(asset))) + " " + _strArguments).Execute();
+            if (!svnLog.Failed)
+            {
+                return svnLog.OutputStr;
+            }
+            return null;
         }
 
         public string Info()
         {
-            m_strLogCache = "";
-            ProgressInformation += buildLogProgressString;
-
-            CreateOperation("info");
-
-            ProgressInformation -= buildLogProgressString;
-            return m_strLogCache;
+            var svnInfo = CreateSVNCommandLine("info").Execute();
+            if (!svnInfo.Failed)
+            {
+                return svnInfo.OutputStr;
+            }
+            return null;
         }
 
-        private void buildLogProgressString(string obj)
-        {
-            m_strLogCache += "\n" + obj;
-        }
 
         public bool Update(IEnumerable<string> assets = null)
         {
