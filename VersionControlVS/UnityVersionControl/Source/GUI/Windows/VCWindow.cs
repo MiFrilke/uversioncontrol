@@ -132,6 +132,7 @@ namespace VersionControl.UserInterface
             VCCommands.Instance.ProgressInformation += ProgressInformation;
             VCSettings.SettingChanged += Repaint;
             VCSettings.SettingChanged += RefreshInfo;
+            VCSettings.EnabledChanged += HandleDisableVc;
             RefreshInfo();
 
             rect = new Rect(0, statusHeight, position.width, 40.0f);
@@ -150,6 +151,7 @@ namespace VersionControl.UserInterface
             VCCommands.Instance.ProgressInformation -= ProgressInformation;
             VCSettings.SettingChanged -= Repaint;
             VCSettings.SettingChanged -= RefreshInfo;
+            VCSettings.EnabledChanged -= HandleDisableVc;
 
 
             vcMultiColumnAssetList.Dispose();
@@ -260,6 +262,15 @@ namespace VersionControl.UserInterface
             });
 
             RefreshInfo();
+        }
+
+        private void HandleDisableVc()
+        {
+            if (!VCSettings.VCEnabled)
+            {
+                commandInProgress = "";
+                RefreshStatus();
+            }
         }
 
         private void RefreshInfo()

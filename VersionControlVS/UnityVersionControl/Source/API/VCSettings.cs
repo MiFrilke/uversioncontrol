@@ -84,8 +84,10 @@ namespace VersionControl
         public enum ESaveAssetsStrategy { Unity, VersionControl, User }
         public enum EHandleFileMove { None, Simple, TeamLicense }
 
-        public static event Action SettingChanged;        
-        
+        public static event Action SettingChanged;
+        public static event Action EnabledChanged;
+
+
         private static bool vcEnabled = true;
         public static bool VCEnabled
         {
@@ -109,6 +111,7 @@ namespace VersionControl
                     }
                 }
                 OnSettingsChanged();
+                OnEnabledChanged();
             }
         }
 
@@ -116,7 +119,12 @@ namespace VersionControl
         {
             if (SettingChanged != null) SettingChanged();
         }
-     
+
+        private static void OnEnabledChanged()
+        {
+            if (EnabledChanged != null) EnabledChanged();
+        }
+
         private static EVersionControlBackend versionControlBackend;
         public static EVersionControlBackend VersionControlBackend 
         { 
