@@ -28,32 +28,36 @@ namespace VersionControl
             return System.Diagnostics.FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
         }
 
-        public static Object Revert(Object obj)
+        public static Object Revert(Object obj, bool _bForced = false)
         {
             var gameObject = obj as GameObject;
             if (gameObject && PrefabHelper.IsPrefab(gameObject, true, false, true) && !PrefabHelper.IsPrefabParent(gameObject))
             {
-                return RevertPrefab(gameObject);
+                return RevertPrefab(gameObject, _bForced);
             }
-            return RevertObject(obj);
+            return RevertObject(obj, _bForced);
         }
 
-        private static Object RevertObject(Object obj)
+        private static Object RevertObject(Object obj, bool _bForced = false)
         {
             if (ObjectUtilities.ChangesStoredInScene(obj)) SceneManagerUtilities.SaveActiveScene();
-            bool success = VCCommands.Instance.RevertDialog(obj.ToAssetPaths());
+            bool success = _bForced ?
+                  VCCommands.Instance.Revert(obj.ToAssetPaths())
+                : VCCommands.Instance.RevertDialog(obj.ToAssetPaths());
             if (success && onHierarchyReverted != null) onHierarchyReverted(obj);
             return obj;
         }
 
-        private static GameObject RevertPrefab(GameObject gameObject)
+        private static GameObject RevertPrefab(GameObject gameObject, bool _bForced = false)
         {
             PrefabHelper.ReconnectToLastPrefab(gameObject);
             PrefabUtility.RevertPrefabInstance(gameObject);
 
             if (ShouldVCRevert(gameObject))
             {
-                bool success = VCCommands.Instance.RevertDialog(gameObject.ToAssetPaths());
+                bool success = _bForced ?
+                      VCCommands.Instance.Revert(gameObject.ToAssetPaths())
+                    : VCCommands.Instance.RevertDialog(gameObject.ToAssetPaths());
                 if (success && onHierarchyReverted != null) onHierarchyReverted(gameObject);
             }
 
