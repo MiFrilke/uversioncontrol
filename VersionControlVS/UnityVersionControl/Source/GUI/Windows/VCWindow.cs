@@ -316,11 +316,11 @@ namespace VersionControl.UserInterface
                     //}
                     if (GUILayout.Button(Terminology.revert, EditorStyles.toolbarButton, buttonLayout))
                     {
-                        VCCommands.Instance.Revert(GetSelectedAssets().ToArray());
+                        VCCommands.Instance.RevertDialog(GetSelectedAssets().ToArray());
                     }
                     if (GUILayout.Button(Terminology.delete, EditorStyles.toolbarButton, buttonLayout))
                     {
-                        VCCommands.Instance.Delete(GetSelectedAssets().ToArray());
+                        VCCommands.Instance.DeleteDialog(GetSelectedAssets().ToArray());
                     }
                     if (GUILayout.Button(Terminology.unlock, EditorStyles.toolbarButton, buttonLayout))
                     {

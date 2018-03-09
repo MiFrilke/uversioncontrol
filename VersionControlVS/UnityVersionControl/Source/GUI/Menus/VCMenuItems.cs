@@ -76,7 +76,7 @@ namespace VersionControl
         private static void VCRevertProjectContext()
         {
             //D.Log(GetAssetPathsOfSelected().Aggregate((a, b) => a + "\n" + b));
-            VCCommands.Instance.Revert(GetAssetPathsOfSelected().ToArray());
+            VCCommands.Instance.RevertDialog(GetAssetPathsOfSelected().ToArray());
         }
 
         [MenuItem("Assets/UVC/" + Terminology.allowLocalEdit)]

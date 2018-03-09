@@ -10,6 +10,7 @@ using VersionControl.UserInterface;
 class VCTreeView : TreeView
 {
     MultiColumnView m_View;
+    private bool m_bInitVisibleColumns = false;
 
     public VCTreeView(MultiColumnView _View, TreeViewState state, MultiColumnHeader multiColumnHeader, bool _bSelectionColumnVisible) : base(state, multiColumnHeader)
     {
@@ -101,6 +102,14 @@ class VCTreeView : TreeView
         }
 
         base.OnGUI(rect);
+
+
+        if (!m_bInitVisibleColumns)
+        {
+            onVisibleColumnsChanged(multiColumnHeader);
+            m_bInitVisibleColumns = true;
+            Repaint();
+        }
     }
 
 

@@ -121,8 +121,8 @@ namespace VersionControl.UserInterface
             menu.AddItem(new GUIContent(Terminology.add), false, () => VCCommands.Instance.Add(assetPaths));
             menu.AddItem(new GUIContent(Terminology.getlock), false, () => VCCommands.Instance.GetLock(assetPaths));
             menu.AddItem(new GUIContent(Terminology.commit), false, () => VCCommands.Instance.CommitDialog(assetPaths));
-            menu.AddItem(new GUIContent(Terminology.revert), false, () => VCCommands.Instance.Revert(assetPaths));
-            menu.AddItem(new GUIContent(Terminology.delete), false, () => VCCommands.Instance.Delete(assetPaths));
+            menu.AddItem(new GUIContent(Terminology.revert), false, () => VCCommands.Instance.RevertDialog(assetPaths));
+            menu.AddItem(new GUIContent(Terminology.delete), false, () => VCCommands.Instance.DeleteDialog(assetPaths));
         }
 
         public struct ValidActions
@@ -198,7 +198,7 @@ namespace VersionControl.UserInterface
                     if (validActions.showCommit)    menu.AddItem(new GUIContent(Terminology.commit),            false, () => Commit(assetPath, instance));
                     if (validActions.showUnlock)    menu.AddItem(new GUIContent(Terminology.unlock),            false, () => VCCommands.Instance.ReleaseLock(new[] { assetPath }));
                     if (validActions.showDisconnect)menu.AddItem(new GUIContent("Disconnect"),                  false, () => PrefabHelper.DisconnectPrefab(instance as GameObject));
-                    if (validActions.showDelete)    menu.AddItem(new GUIContent(Terminology.delete),            false, () => VCCommands.Instance.Delete(new[] { assetPath }));
+                    if (validActions.showDelete)    menu.AddItem(new GUIContent(Terminology.delete),            false, () => VCCommands.Instance.DeleteDialog(new[] { assetPath }));
                     if (validActions.showRevert)    menu.AddItem(new GUIContent(Terminology.revert),            false, () => Revert(assetPath, instance));
                 }
                 else
@@ -229,7 +229,7 @@ namespace VersionControl.UserInterface
         private static void Revert(string assetPath, Object instance)
         {
             if (instance != null) VCUtility.Revert(instance);
-            else VCCommands.Instance.Revert(new[] { assetPath });
+            else VCCommands.Instance.RevertDialog(new[] { assetPath });
         }
 
         public static void DiaplayVCContextMenu(string assetPath, Object instance = null, float xoffset = 0.0f, float yoffset = 0.0f, bool showAssetName = false)

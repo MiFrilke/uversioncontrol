@@ -481,6 +481,14 @@ namespace VersionControl
                 return revertSuccess;
             });
         }
+        public bool RevertDialog(IEnumerable<string> assets)
+        {
+            if (VCUtility.VCDialog(Terminology.revert, assets))
+                return Revert(assets);
+            else
+                return false;
+        }
+
         public bool Delete(IEnumerable<string> assets, OperationMode mode = OperationMode.Force)
         {
             return HandleExceptions(() =>
@@ -530,6 +538,14 @@ namespace VersionControl
                 return result;
             });
         }
+        public bool DeleteDialog(IEnumerable<string> assets)
+        {
+            if (VCUtility.VCDialog(Terminology.delete, assets))
+                return Delete(assets);
+            else
+                return false;
+        }
+
         public bool GetLock(IEnumerable<string> assets, OperationMode mode = OperationMode.Normal)
         {
             return HandleExceptions(() => PerformOperation(OperationType.GetLock, assets, _assets => vcc.GetLock(_assets,mode)));

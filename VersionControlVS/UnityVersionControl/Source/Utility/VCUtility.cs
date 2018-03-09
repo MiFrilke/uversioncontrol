@@ -41,7 +41,7 @@ namespace VersionControl
         private static Object RevertObject(Object obj)
         {
             if (ObjectUtilities.ChangesStoredInScene(obj)) SceneManagerUtilities.SaveActiveScene();
-            bool success = VCCommands.Instance.Revert(obj.ToAssetPaths());
+            bool success = VCCommands.Instance.RevertDialog(obj.ToAssetPaths());
             if (success && onHierarchyReverted != null) onHierarchyReverted(obj);
             return obj;
         }
@@ -53,7 +53,7 @@ namespace VersionControl
 
             if (ShouldVCRevert(gameObject))
             {
-                bool success = VCCommands.Instance.Revert(gameObject.ToAssetPaths());
+                bool success = VCCommands.Instance.RevertDialog(gameObject.ToAssetPaths());
                 if (success && onHierarchyReverted != null) onHierarchyReverted(gameObject);
             }
 
