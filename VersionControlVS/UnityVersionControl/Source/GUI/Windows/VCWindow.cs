@@ -73,7 +73,10 @@ namespace VersionControl.UserInterface
                 string[] arPaths = VCSettings.strHiddenFilePaths.Split(';');
                 for (int i = 0; i < arPaths.Length; i++)
                 {
-                    if (arPaths[i].Trim(new[] { ' ' }) == vcStatus.assetPath.Compose())
+                    string strPathToCheck = arPaths[i].Trim(new[] { ' ' });
+                    string strPath = vcStatus.assetPath.Compose();
+                    if (strPath == strPathToCheck ||
+                    (strPathToCheck != "" && strPath.StartsWith(strPathToCheck) && strPath.Replace(strPathToCheck, "").StartsWith("/")))
                         bHidden = true;
                 }
             }

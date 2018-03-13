@@ -243,7 +243,10 @@ namespace VersionControl
                 string[] arPaths = strHiddenFilePaths.Split(';');
                 for (int i = 0; i < arPaths.Length; i++)
                 {
-                    if (arPaths[i].Trim(new[] { ' ' }) == _strPath)
+                    //if (arPaths[i].Trim(new[] { ' ' }) == _strPath)
+                    string strPathToCheck = arPaths[i].Trim(new[] { ' ' });
+                    if (_strPath == strPathToCheck ||
+                    (strPathToCheck != "" && _strPath.StartsWith(strPathToCheck) && _strPath.Replace(strPathToCheck, "").StartsWith("/")))
                         bHidden = true;
                 }
             }
