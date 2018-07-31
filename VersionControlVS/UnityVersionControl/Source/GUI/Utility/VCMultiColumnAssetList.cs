@@ -375,10 +375,10 @@ namespace VersionControl.UserInterface
 
         public void SetMasterSelection(VersionControlStatus status, bool selected)
         {
+            commitSelection.RemoveWhere(x => x.assetPath.Compose().Equals(status.assetPath.Compose())) ;
+
             if (selected)
                 commitSelection.Add(status);
-            else
-                commitSelection.Remove(status);
         }
 
         public void refreshSelection(IEnumerable<ComposedString> _assePaths)

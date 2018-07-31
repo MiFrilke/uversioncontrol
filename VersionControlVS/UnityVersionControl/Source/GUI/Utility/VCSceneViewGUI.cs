@@ -48,13 +48,13 @@ namespace VersionControl.UserInterface
             backgroundGuiStyle.border = new RectOffset(1, 1, 1, 1);
             backgroundGuiStyle.alignment = TextAnchor.MiddleCenter;
 
-            var rect = new Rect(5, 5, 200, 65);
+            var rect = new Rect(5, 5, 200, 95);
             Handles.BeginGUI();
             GUILayout.BeginArea(new Rect(0, 0, rect.width, rect.height));
             GUILayout.TextField(AssetStatusUtils.GetLockStatusMessage(vcSceneStatus), backgroundGuiStyle);
 
             int numberOfButtons = 0;
-            const int maxButtons = 4;
+            const int maxButtons = 5;
 
             var validActions = VCGUIControls.GetValidActions(assetPath);                       
 
@@ -62,6 +62,12 @@ namespace VersionControl.UserInterface
             {
                 using (new PushState<bool>(GUI.enabled, VCCommands.Instance.Ready, v => GUI.enabled = v))
                 {
+                    numberOfButtons++;
+                    if (GUILayout.Button("Refresh", buttonStyle))
+                    {
+                        Refresh();
+                    }
+
                     if (validActions.showAdd)
                     {
                         numberOfButtons++;
@@ -76,7 +82,13 @@ namespace VersionControl.UserInterface
                         numberOfButtons++;
                         if (GUILayout.Button(Terminology.getlock, buttonStyle))
                         {
-                            VCCommands.Instance.GetLockTask(new[] { SceneManagerUtilities.GetCurrentScenePath() });
+                            Refresh();
+                            if (!validActions.showOpen)
+                            {
+                                EditorUtility.DisplayDialog("Cannot open Scene!", "This scene has been opened by another user since the last refresh.", "Ok");
+                            }
+                            else
+                                VCCommands.Instance.GetLockTask(new[] { SceneManagerUtilities.GetCurrentScenePath() });
                         }
                     }
                     if (validActions.showCommit)

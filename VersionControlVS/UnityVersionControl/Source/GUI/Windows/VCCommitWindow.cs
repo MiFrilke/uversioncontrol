@@ -103,8 +103,9 @@ namespace VersionControl.UserInterface
 
         private void CommitProgressGUI()
         {
-            scrollViewVectorLog = EditorGUILayout.BeginScrollView(scrollViewVectorLog, false, false);
-            GUILayout.TextArea(commitProgress);
+            scrollViewVectorLog = EditorGUILayout.BeginScrollView(scrollViewVectorLog, false, true);
+            Rect rect = EditorGUILayout.GetControlRect(GUILayout.Height(this.position.height - 70f));
+            EditorGUI.SelectableLabel(rect, commitProgress);
             EditorGUILayout.EndScrollView();
             if (commitCompleted)
             {
@@ -112,6 +113,7 @@ namespace VersionControl.UserInterface
                 if (GUILayout.Button("Close"))
                 {
                     Close();
+                    VersionControl.VCUtility.RefreshWindowNextDraw();
                 }
             }
         }

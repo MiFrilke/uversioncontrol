@@ -57,14 +57,14 @@ namespace UnityVersionControl.Source.GUI.Windows
 
             m_iDayStart = Mathf.Clamp(EditorGUILayout.IntField("Day: ", m_iDayStart, GUILayout.Width(100)), 1, 31);
             m_iMonthStart = (Month)EditorGUILayout.EnumPopup("Month: ", m_iMonthStart, GUILayout.Width(100));
-            m_iYearStart = Mathf.Clamp(EditorGUILayout.IntField("Year: ", m_iYearStart, GUILayout.Width(100)), 2005, 2017);
+            m_iYearStart = Mathf.Clamp(EditorGUILayout.IntField("Year: ", m_iYearStart, GUILayout.Width(100)), 2005, System.DateTime.Today.Year);
 
             GUILayout.Space(100);
             GUILayout.Label("To: ", GUILayout.Width(50));
 
             m_iDayEnd = Mathf.Clamp(EditorGUILayout.IntField("Day: ", m_iDayEnd, GUILayout.Width(100)), 1, 31);
             m_iMonthEnd = (Month)EditorGUILayout.EnumPopup("Month: ", m_iMonthEnd, GUILayout.Width(100));
-            m_iYearEnd = Mathf.Clamp(EditorGUILayout.IntField("Year: ", m_iYearEnd, GUILayout.Width(100)), 2005, 2017);
+            m_iYearEnd = Mathf.Clamp(EditorGUILayout.IntField("Year: ", m_iYearEnd, GUILayout.Width(100)), 2005, System.DateTime.Today.Year);
 
             EditorGUIUtility.labelWidth = fOldWidth;
             GUILayout.EndHorizontal();
@@ -134,16 +134,24 @@ namespace UnityVersionControl.Source.GUI.Windows
 
         public log(string _strAssetPath, string _strArgument)
         {
+            m_liLogEntries = new List<logEntry>();
+
+
             m_strPath = _strAssetPath;
 
             string strLog = VersionControl.VCCommands.Instance.Log(m_strPath, _strArgument);
+            if (strLog == null || strLog == "")
+                return;
+
             string[] arEntries = strLog.Split(new string[] { c_strLogSeparator}, StringSplitOptions.RemoveEmptyEntries);
 
-            m_liLogEntries = new List<logEntry>();
+
+            if (arEntries == null)
+                return;
             for (int i = 0; i < arEntries.Length; i++)
             {
                 string strCurrentEntry = arEntries[i].Trim(new char[] { ' ', '\n', '\r' });
-                if (strCurrentEntry != "")
+                if (strCurrentEntry != null && strCurrentEntry != "")
                 {
 
                     string[] arCurrentEntry = strCurrentEntry.Split(c_arHeaderContentSeparator, StringSplitOptions.RemoveEmptyEntries);
@@ -190,14 +198,18 @@ namespace UnityVersionControl.Source.GUI.Windows
 
         public void OnGUI()
         {
-            m_bExpanded = EditorGUILayout.Foldout(m_bExpanded, m_strHeader);
+            GUILayout.BeginHorizontal();
+            Rect rect = EditorGUILayout.GetControlRect(GUILayout.Width(30));
+            m_bExpanded = EditorGUI.Foldout(rect, m_bExpanded, "");
+            EditorGUILayout.SelectableLabel(m_strHeader, EditorStyles.boldLabel);
+            GUILayout.EndHorizontal();
             EditorGUILayout.Space();
 
             if (m_bExpanded)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("", GUILayout.Width(20));
-                GUILayout.Label(m_strContent);
+                EditorGUILayout.SelectableLabel("", GUILayout.Width(20));
+                EditorGUILayout.SelectableLabel(m_strContent);
                 GUILayout.EndHorizontal();
             }
         }

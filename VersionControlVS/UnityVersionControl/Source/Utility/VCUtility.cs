@@ -23,6 +23,11 @@ namespace VersionControl
         public static System.Func<Object, bool> onHierarchyAllowGetLock;
         public static System.Action<Object> onHierarchyAllowLocalEdit;
 
+        public static void RefreshWindowNextDraw()
+        {
+            VersionControl.UserInterface.VCWindow.c_bNeedsRefresh = true;
+        }
+
         public static string GetCurrentVersion()
         {
             return System.Diagnostics.FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
@@ -143,7 +148,17 @@ namespace VersionControl
         public static bool VCDialog(string command, IEnumerable<string> assetPaths)
         {
             if (!assetPaths.Any()) return false;
-            return EditorUtility.DisplayDialog(command + " following assest in Version Control?", "\n" + assetPaths.Aggregate((a, b) => a + "\n" + b), "Yes", "No");
+
+            string strAssetPaths = assetPaths.Aggregate((a, b) => a + "\n" + b);
+
+            string strDialog = strAssetPaths;
+            if (assetPaths.Count() > 30)
+            {
+                strDialog = "Too many Assets to display here. \n Full list will be logged into console instead.";
+                Debug.Log(strAssetPaths);
+            }
+
+            return EditorUtility.DisplayDialog(command + " following assest in Version Control?", "\n" + strDialog, "Yes", "No");
         }
 
         public static void VCDeleteWithConfirmation(IEnumerable<string> assetPaths, bool showConfirmation = true)

@@ -25,6 +25,8 @@ namespace VersionControl.UserInterface
         const int maxProgressSize = 10000;
         private readonly Color activeColor = new Color(0.8f, 0.8f, 1.0f);
 
+        public static bool c_bNeedsRefresh;
+
         // State
         private bool m_bShowUserHidden = false;
         private bool showUnversioned = true;
@@ -224,15 +226,19 @@ namespace VersionControl.UserInterface
             vcMultiColumnAssetList.DrawGUI();
             GUILayout.EndArea();
 
-            GUILayout.BeginArea(new Rect(0, rect.y, position.width, position.height - rect.y));
-            DrawStatus();
-            GUILayout.EndArea();
+            DrawStatus(new Rect(0, (rect.y + 6), position.width, position.height - (rect.y + 6)));
 
             EditorGUILayout.EndVertical();
         }
 
         private void HandleInput()
         {
+            if (c_bNeedsRefresh)
+            {
+                RefreshStatus();
+                c_bNeedsRefresh = false;
+            }
+
             if (Event.current.type == EventType.KeyDown)
             {
                 if (Event.current.keyCode == KeyCode.F5)
@@ -466,13 +472,13 @@ namespace VersionControl.UserInterface
                 UpdateFilteringOfKeys();
         }
 
-        private void DrawStatus()
+        private void DrawStatus(Rect _rect)
         {
-            GUILayout.Space(6);
             statusScroll = EditorGUILayout.BeginScrollView(statusScroll, false, false);
             var originalColor = GUI.backgroundColor;
             if (updateInProgress) GUI.backgroundColor = activeColor;
-            GUILayout.TextArea(commandInProgress, GUILayout.ExpandHeight(true));
+            //GUILayout.TextArea(commandInProgress, GUILayout.ExpandHeight(true));
+            EditorGUI.SelectableLabel(_rect, commandInProgress);
             GUI.backgroundColor = originalColor;
             EditorGUILayout.EndScrollView();
         }
