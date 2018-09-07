@@ -63,7 +63,7 @@ namespace VersionControl
             D.Log("Deleted In Folders: " + deletedInFolders.AggregateString());
 
             bool result =
-                base.Add(filesInFolders.UnversionedInVersionedFolder(vcc)) &&
+                base.Add(filesInFolders.UnversionedInVersionedFolder(vcc).ShortestFirst().Distinct()) &&
                 base.Delete(filesInFolders.Missing(vcc), OperationMode.Normal) &&
                 base.Commit(filesInFolders.ShortestFirst(), commitMessage) &&
                 Status(assets, StatusLevel.Local) &&

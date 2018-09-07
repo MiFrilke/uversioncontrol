@@ -92,6 +92,14 @@ internal class MultiColumnView
         m_columnSortedBefore = (Column)multiColumnHeader.sortedColumnIndex;
     }
 
+    public void refreshSorting()
+    {
+        m_liItems.Sort(compareItems);
+
+        if (m_onSortingChanged != null)
+            m_onSortingChanged(m_columnSortedBefore, m_columnSortedBefore);
+    }
+
     public void Dispose()
     {
         if (m_treeView != null)
@@ -120,6 +128,7 @@ internal class MultiColumnView
         if (m_onSortingChanged != null)
             m_onSortingChanged(m_columnSortedBefore, (Column)_header.sortedColumnIndex);
         m_columnSortedBefore = (Column)_header.sortedColumnIndex;
+
     }
 
     private int compareItems(VersionControl.VersionControlStatus _vcs1, VersionControl.VersionControlStatus _vcs2)
@@ -182,6 +191,7 @@ internal class MultiColumnView
 
     public void rebuildTreeView()
     {
+        refreshSorting();
         m_treeView.Reload();
     }
 

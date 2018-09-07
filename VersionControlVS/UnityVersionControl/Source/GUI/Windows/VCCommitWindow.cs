@@ -80,7 +80,7 @@ namespace VersionControl.UserInterface
 
         private void OnEnable()
         {
-            minSize  = new Vector2(1000, 400);
+            minSize  = new Vector2(500, 400);
             commitMessageHeight = EditorPrefs.GetFloat("VCCommitWindow/commitMessageHeight", 140.0f);
             rect = new Rect(0, commitMessageHeight, position.width, 10.0f);
             vcMultiColumnAssetList = new VCMultiColumnAssetList(Repaint, /*VCSettings.SelectiveCommit*/ true);
@@ -103,10 +103,13 @@ namespace VersionControl.UserInterface
 
         private void CommitProgressGUI()
         {
-            scrollViewVectorLog = EditorGUILayout.BeginScrollView(scrollViewVectorLog, false, true);
-            Rect rect = EditorGUILayout.GetControlRect(GUILayout.Height(this.position.height - 70f));
-            EditorGUI.SelectableLabel(rect, commitProgress);
+            scrollViewVectorLog = EditorGUILayout.BeginScrollView(scrollViewVectorLog, false, false);
+            Vector2 textSize = GUI.skin.label.CalcSize(new GUIContent(commitProgress));
+            EditorGUILayout.SelectableLabel(commitProgress, GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true), GUILayout.MinWidth(textSize.x), 
+                GUILayout.MinHeight(Mathf.Max(textSize.y, this.position.height - 70f)));
             EditorGUILayout.EndScrollView();
+
+
             if (commitCompleted)
             {
                 GUILayout.FlexibleSpace();

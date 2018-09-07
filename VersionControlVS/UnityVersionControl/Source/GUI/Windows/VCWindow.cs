@@ -263,14 +263,19 @@ namespace VersionControl.UserInterface
             VCCommands.Instance.ClearDatabase();
             var statusLevel = remoteProjectReflection ? StatusLevel.Remote : StatusLevel.Local;
             var detailLevel = remoteProjectReflection ? DetailLevel.Verbose : DetailLevel.Normal;
-            VCCommands.Instance.StatusTask(statusLevel, detailLevel).ContinueWithOnNextUpdate(t =>
+            System.Threading.Tasks.Task<bool> taskStatus = VCCommands.Instance.StatusTask(statusLevel, detailLevel);
+            taskStatus.ContinueWithOnNextUpdate(t =>
             {
                 VCCommands.Instance.ActivateRefreshLoop();
                 refreshInProgress = false;
-                RefreshGUI();
             });
 
+
+            //taskStatus.Wait();
+            vcMultiColumnAssetList.RefreshSorting();
             RefreshInfo();
+
+            RefreshGUI();
         }
 
         private void HandleDisableVc()
@@ -474,13 +479,18 @@ namespace VersionControl.UserInterface
 
         private void DrawStatus(Rect _rect)
         {
+            GUILayout.BeginArea(_rect);
             statusScroll = EditorGUILayout.BeginScrollView(statusScroll, false, false);
             var originalColor = GUI.backgroundColor;
             if (updateInProgress) GUI.backgroundColor = activeColor;
             //GUILayout.TextArea(commandInProgress, GUILayout.ExpandHeight(true));
-            EditorGUI.SelectableLabel(_rect, commandInProgress);
+
+            Vector2 textSize = GUI.skin.label.CalcSize(new GUIContent(commandInProgress));
+
+            EditorGUILayout.SelectableLabel( commandInProgress, GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true), GUILayout.MinWidth(textSize.x),GUILayout.MinHeight(textSize.y));
             GUI.backgroundColor = originalColor;
             EditorGUILayout.EndScrollView();
+            GUILayout.EndArea();
         }
 
         public static PushState<Color> GUIColor(Color color)

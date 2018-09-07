@@ -89,11 +89,16 @@ namespace VersionControl.UserInterface
             return new GUIContent(AssetStatusUtils.GetStatusText(assetStatus), IconUtils.circleIcon.GetTexture(AssetStatusUtils.GetStatusColor(assetStatus, true)));
         }
 
-        private void initOrRefreshMultiColumnView()
+        public void initOrRefreshMultiColumnView()
         {
             if (m_MultiColumnView != null)
                 m_MultiColumnView.Dispose();
             m_MultiColumnView = new MultiColumnView(showMasterSelection? commitSelection : interrestingStatus, showMasterSelection);
+        }
+
+        public void RefreshSorting()
+        {
+            m_MultiColumnView.refreshSorting();
         }
 
         private void Initialize()
@@ -363,6 +368,7 @@ namespace VersionControl.UserInterface
             ProfilerUtilities.EndSample();
         }
 
+  
         public IEnumerable<VersionControlStatus> GetSelection()
         {
             return m_MultiColumnView.GetSelection();
