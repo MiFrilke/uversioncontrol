@@ -123,13 +123,13 @@ namespace VersionControl.UnitTests
             return true;
         }
 
-        public bool Commit(IEnumerable<string> assets, string commitMessage = "")
+        public bool Commit(IEnumerable<string> assets, string commitMessage = "", bool _bEmptyDepth = false)
         {
             dataCarrier.assets = assets.ToList();
             return true;
         }
 
-        public bool Add(IEnumerable<string> assets)
+        public bool Add(IEnumerable<string> assets, bool _bEmptyDepth = false)
         {
             dataCarrier.assets = assets.ToList();
             return true;

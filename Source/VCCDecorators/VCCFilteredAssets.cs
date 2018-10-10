@@ -55,17 +55,21 @@ namespace VersionControl
             return base.Update((assets != null ? assets.Versioned(vcc) : null));
         }
 
-        public override bool Commit(IEnumerable<string> assets, string commitMessage = "")
+        public override bool Commit(IEnumerable<string> assets, string commitMessage = "", bool _bEmptyDepth = false)
         {
-            var filesInFolders = assets.AddFilesInFolders(vcc, true).AddedOrUnversionedParentFolders(vcc).ToArray();
+            var filesInFolders = assets./*AddFilesInFolders(vcc, true).*/AddedOrUnversionedParentFolders(vcc).ShortestFirst().ToArray();
             var deletedInFolders = assets.AddDeletedInFolders(vcc);
 
             D.Log("Deleted In Folders: " + deletedInFolders.AggregateString());
+            D.Log("Files In Folders: " + filesInFolders.AggregateString());
+
+            D.Log("Adding filesinfolders from commit - " + _bEmptyDepth);
+
 
             bool result =
-                base.Add(filesInFolders.UnversionedInVersionedFolder(vcc).ShortestFirst().Distinct()) &&
+                base.Add(filesInFolders./*UnversionedInVersionedFolder(vcc).*/ShortestFirst().Distinct(), _bEmptyDepth) &&
                 base.Delete(filesInFolders.Missing(vcc), OperationMode.Normal) &&
-                base.Commit(filesInFolders.ShortestFirst(), commitMessage) &&
+                base.Commit(filesInFolders.ShortestFirst(), commitMessage, _bEmptyDepth) &&
                 Status(assets, StatusLevel.Local) &&
                 ReleaseLock(assets);
 
@@ -75,9 +79,9 @@ namespace VersionControl
             return result;
         }
 
-        public override bool Add(IEnumerable<string> assets)
+        public override bool Add(IEnumerable<string> assets, bool _bEmptyDepth = false)
         {
-            return base.Add(assets.UnversionedInVersionedFolder(vcc));
+            return base.Add(assets.UnversionedInVersionedFolder(vcc), _bEmptyDepth);
         }
 
         public override bool Revert(IEnumerable<string> assets)

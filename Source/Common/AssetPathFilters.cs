@@ -21,7 +21,7 @@ namespace VersionControl.AssetPathFilters
         }
         public static IEnumerable<string> UnversionedInVersionedFolder(this IEnumerable<string> assets, IVersionControlCommands vcc)
         {
-            return assets.Where(a => vcc.GetAssetStatus(a).fileStatus == VCFileStatus.Unversioned && !a.InUnversionedParentFolder(vcc));
+            return  assets.Where(a => vcc.GetAssetStatus(a).fileStatus == VCFileStatus.Unversioned && !a.InUnversionedParentFolder(vcc));
         }
         public static IEnumerable<string> Versioned(this IEnumerable<string> assets, IVersionControlCommands vcc)
         {
@@ -72,7 +72,29 @@ namespace VersionControl.AssetPathFilters
         }
         public static IEnumerable<string> AddedOrUnversionedParentFolders(this IEnumerable<string> assets, IVersionControlCommands vcc)
         {
-            return assets.Concat(assets.SelectMany(ParentFolders).Where(a => vcc.GetAssetStatus(a).fileStatus == VCFileStatus.Unversioned || vcc.GetAssetStatus(a).fileStatus == VCFileStatus.Added)).Distinct().ToArray();
+            return assets.Concat(assets.SelectMany(ParentFolders).Where(a =>
+            {
+                Logging.D.Log("AddedOrUnversionedParentFolders: " + a + " - " + vcc.GetAssetStatus(a).fileStatus);
+
+                bool bAddedOrUnversioned = vcc.GetAssetStatus(a).fileStatus == VCFileStatus.Unversioned || vcc.GetAssetStatus(a).fileStatus == VCFileStatus.Added;
+                if (bAddedOrUnversioned)
+                    return true;
+
+                //else if (vcc.GetAssetStatus(a).fileStatus == VCFileStatus.Normal) //Should not happen anymore (Direcotry exists fix)
+                //{
+                //    IEnumerable<string> parentsOfParent = ParentFolders(a);
+                //    foreach (string strParent in parentsOfParent)
+                //    {
+                //        if (vcc.GetAssetStatus(strParent).fileStatus == VCFileStatus.Unversioned || vcc.GetAssetStatus(strParent).fileStatus == VCFileStatus.Added)
+                //            return true;
+                //    }
+
+                //    return false;
+                //}
+
+                else return false;
+            }
+            )).Distinct().ToArray();
         }
         public static bool InUnversionedParentFolder(this string asset, IVersionControlCommands vcc)
         {
@@ -92,10 +114,15 @@ namespace VersionControl.AssetPathFilters
             if (!string.IsNullOrEmpty(asset))
             {
                 string currentFolder = "";
-                foreach (var folderIt in Path.GetDirectoryName(asset).Split(pathSeparator))
+                string strDirectory = Path.GetDirectoryName(asset.Replace(pathSeparator, System.IO.Path.DirectorySeparatorChar)).Replace(System.IO.Path.DirectorySeparatorChar, pathSeparator);
+                //Logging.D.Log("Get PArents: " + asset + " -> " + asset.Replace(pathSeparator, System.IO.Path.DirectorySeparatorChar) + " -> " + Path.GetDirectoryName(asset.Replace(pathSeparator, System.IO.Path.DirectorySeparatorChar)) + " -> " + strDirectory);
+                foreach (var folderIt in strDirectory.Split(pathSeparator))
                 {
                     currentFolder += folderIt + pathSeparator;
                     parentFolders.Add(currentFolder.TrimEnd(pathSeparator));
+
+                   // Logging.D.Log(currentFolder.TrimEnd(pathSeparator));
+
                 }
             }
             return parentFolders;
@@ -110,6 +137,7 @@ namespace VersionControl.AssetPathFilters
                         .Concat(Directory.GetFiles(assetIt, "*", SearchOption.AllDirectories)
                         .Where(a => File.Exists(a) && !a.Contains("/.") && !a.Contains("\\.") && (File.GetAttributes(a) & FileAttributes.Hidden) == 0)
                         .Select(s => s.Replace("\\", "/")))
+                        .Distinct()
                         .ToArray();
                 }
             }

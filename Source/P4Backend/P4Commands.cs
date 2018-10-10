@@ -743,7 +743,7 @@ namespace VersionControl.Backend.P4
             return CreateAssetOperation("update", assets);
         }
 
-        public bool Commit(IEnumerable<string> assets, string commitMessage = "")
+        public bool Commit(IEnumerable<string> assets, string commitMessage = "", bool _bEmptyDepth = false)
         {
             string arguments = "change -i";
             CommandLineOutput statusCommandLineOutput;
@@ -790,7 +790,7 @@ namespace VersionControl.Backend.P4
             foreach (var asset in assets) AddToLocalStatusQueue(asset);
         }
 
-        public bool Add(IEnumerable<string> assets)
+        public bool Add(IEnumerable<string> assets, bool _bEmptyDepth = false)
         {
             bool success = CreateAssetOperation("add -f ", assets);
             if (success) UpdateAfterOperation(assets);

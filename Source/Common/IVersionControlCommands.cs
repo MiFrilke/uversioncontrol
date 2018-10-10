@@ -57,8 +57,8 @@ namespace VersionControl
         bool Status(StatusLevel statusLevel, DetailLevel detailLevel);
         bool Status(IEnumerable<string> assets, StatusLevel statusLevel);
         bool Update(IEnumerable<string> assets = null);
-        bool Commit(IEnumerable<string> assets, string commitMessage = "");
-        bool Add(IEnumerable<string> assets);
+        bool Commit(IEnumerable<string> assets, string commitMessage = "", bool _bEmptyDepth = false);
+        bool Add(IEnumerable<string> assets, bool _bEmptyDepth = false);
         bool Revert(IEnumerable<string> assets);
         bool Delete(IEnumerable<string> assets, OperationMode mode);
         bool GetLock(IEnumerable<string> assets, OperationMode mode);

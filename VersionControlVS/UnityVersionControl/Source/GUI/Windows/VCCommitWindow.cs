@@ -148,7 +148,8 @@ namespace VersionControl.UserInterface
                 statusScroll = EditorGUILayout.BeginScrollView(statusScroll, false, false);
                 string strCommitMessageOld = CommitMessage;
 
-                    CommitMessage = EditorGUILayout.TextArea(CommitMessage, GUILayout.MinWidth(100), GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+                GUI.SetNextControlName("Message");
+                CommitMessage = EditorGUILayout.TextArea(CommitMessage, GUILayout.MinWidth(100), GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 
                 if (CommitMessage.Length > strCommitMessageOld.Length)
                 {
@@ -204,7 +205,9 @@ namespace VersionControl.UserInterface
                             statusScroll.y = Mathf.Infinity;
                             Repaint();
                         };
-                        var commitTask = VCCommands.Instance.CommitTask(selectedAssets, CommitMessage);
+                        foreach (string str in selectedAssets)
+                            Debug.Log("Committing: " + str);
+                        var commitTask = VCCommands.Instance.CommitTask(selectedAssets, CommitMessage, VCSettings.NonRecursiveAdd);
                         commitTask.ContinueWithOnNextUpdate(result =>
                         {
                             if (result)
@@ -255,7 +258,7 @@ namespace VersionControl.UserInterface
 
     internal class CommitAutoCompleteSuggestion : PopupWindowContent
     {
-        public const string c_strWarning = "de/resel!";
+        public const string c_strWarning = "de/reset!";
 
         private string m_strSuggestion;
         private int m_iOriginalLength;

@@ -335,17 +335,17 @@ namespace VersionControl
             return updateTask;
         }
 
-        public Task<bool> AddTask(IEnumerable<string> assets)
+        public Task<bool> AddTask(IEnumerable<string> assets, bool _bEmptyDepth = false)
         {
             assets = new List<string>(assets);
-            return StartTask(() => Add(assets));
+            return StartTask(() => Add(assets, _bEmptyDepth));
         }
 
-        public Task<bool> CommitTask(IEnumerable<string> assets, string commitMessage = "")
+        public Task<bool> CommitTask(IEnumerable<string> assets, string commitMessage = "", bool _bEmptyDepth = false)
         {
             assets = new List<string>(assets);
             FlushFiles();
-            return StartTask(() => Commit(assets, commitMessage));
+            return StartTask(() => Commit(assets, commitMessage, _bEmptyDepth));
         }
 
         public Task<bool> GetLockTask(IEnumerable<string> assets, OperationMode mode = OperationMode.Normal)
@@ -444,23 +444,23 @@ namespace VersionControl
             return updateResult;
         }
 
-        public bool Commit(IEnumerable<string> assets, string commitMessage = "")
+        public bool Commit(IEnumerable<string> assets, string commitMessage = "", bool _bEmptyDepth = false)
         {
             return HandleExceptions(() =>
             {
                 FlushFiles();
                 Status(assets, StatusLevel.Local);
                 var beforeStatus = StoreCurrentStatus(assets);
-                bool commitSuccess = vcc.Commit(assets, commitMessage);
+                bool commitSuccess = vcc.Commit(assets, commitMessage, _bEmptyDepth);
                 Status(assets, StatusLevel.Local);
                 var afterStatus = StoreCurrentStatus(assets); ;
                 OnOperationCompleted(OperationType.Commit, beforeStatus, afterStatus, commitSuccess);
                 return commitSuccess;
             });
         }
-        public bool Add(IEnumerable<string> assets)
+        public bool Add(IEnumerable<string> assets, bool _bEmptyDepth = false)
         {
-            return HandleExceptions(() => vcc.Add(assets));
+            return HandleExceptions(() => vcc.Add(assets, _bEmptyDepth));
         }
         public bool Revert(IEnumerable<string> assets)
         {
@@ -688,7 +688,7 @@ namespace VersionControl
             {
                 return OpenCommitDialogWindow(assets, dependencies);
             }
-            return Commit(assets, commitMessage);
+            return Commit(assets, commitMessage, VCSettings.NonRecursiveAdd);
         }
 
         public bool AllowLocalEdit(IEnumerable<string> assets)

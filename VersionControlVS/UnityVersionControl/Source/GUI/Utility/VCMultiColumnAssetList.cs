@@ -429,10 +429,22 @@ namespace VersionControl.UserInterface
 
         public void DrawGUI()
         {
-            if (GUIUtility.hotControl == 0 && GUIUtility.keyboardControl == 0 && Event.current.isKey && Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Space)
+            if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Space)
             {
-                ToggleMasterSelection();
+                if (GUI.GetNameOfFocusedControl() != "Message")
+                {
+                    ToggleMasterSelection();
+                    //Debug.Log("Toggle: " + GetMasterSelection().Count() + " - " + GUI.GetNameOfFocusedControl());
+                }
+                else
+                {
+                    Event.current.Use();
+                }
             }
+            //else if (Event.current.isKey)
+            //    Debug.Log("Fail: " + GUI.GetNameOfFocusedControl() + " - " + GUIUtility.hotControl + " - " + GUIUtility.keyboardControl + " - " + Event.current.type + " - " + Event.current.keyCode);
+
+
 
             Rect rect = GUILayoutUtility.GetRect(5, float.MaxValue, 5, float.MaxValue, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             GUI.Box(rect, "");

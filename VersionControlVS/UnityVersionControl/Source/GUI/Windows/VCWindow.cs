@@ -29,6 +29,8 @@ namespace VersionControl.UserInterface
 
         // State
         private bool m_bShowUserHidden = false;
+        private bool m_bShowExternal = false;
+
         private bool showUnversioned = true;
         private bool showMeta = true;
         private bool showModifiedNoLock = true;
@@ -82,8 +84,10 @@ namespace VersionControl.UserInterface
                         bHidden = true;
                 }
             }
+            bool bExternal = (vcStatus.fileStatus == VCFileStatus.External);            
+
             bool bFitsFilter = 
-                !((!m_bShowUserHidden && bHidden) || (!showUnversioned && unversioned) || (!showMeta && meta) || (!showModifiedNoLock && modifiedNoLock) || (!showProjectSetting && projectSetting));
+                !((!m_bShowExternal && bExternal) || (!m_bShowUserHidden && bHidden) || (!showUnversioned && unversioned) || (!showMeta && meta) || (!showModifiedNoLock && modifiedNoLock) || (!showProjectSetting && projectSetting));
 
             return bFitsFilter;
             //bool rest = !unversioned && !meta && !modifiedNoLock && !projectSetting;
@@ -126,6 +130,7 @@ namespace VersionControl.UserInterface
             showModifiedNoLock = EditorPrefs.GetBool("VCWindow/showModifiedNoLock", true);
             statusHeight = EditorPrefs.GetFloat("VCWindow/statusHeight", 400.0f);
             m_bShowUserHidden = EditorPrefs.GetBool("VCWindow/showHidden", false);
+            m_bShowExternal = EditorPrefs.GetBool("VCWindow/showExternal", false);
 
             vcMultiColumnAssetList = new VCMultiColumnAssetList();
 
@@ -150,6 +155,7 @@ namespace VersionControl.UserInterface
             EditorPrefs.SetBool("VCWindow/showModifiedNoLock", showModifiedNoLock);
             EditorPrefs.SetFloat("VCWindow/statusHeight", statusHeight);
             EditorPrefs.SetBool("VCWindow/showHidden", m_bShowUserHidden);
+            EditorPrefs.SetBool("VCWindow/showExternal", m_bShowExternal);
 
             VCCommands.Instance.StatusCompleted -= RefreshGUI;
             VCCommands.Instance.OperationCompleted -= OperationComplete;
@@ -358,6 +364,12 @@ namespace VersionControl.UserInterface
 
                 GUILayout.FlexibleSpace();
 
+                bool newShowModifiedProjectSettings = GUILayout.Toggle(showProjectSetting, "Project Settings", EditorStyles.toolbarButton, new[] { GUILayout.MaxWidth(95) });
+                if (newShowModifiedProjectSettings != showProjectSetting)
+                {
+                    showProjectSetting = newShowModifiedProjectSettings;
+                    UpdateFilteringOfKeys();
+                }
                 //Stella: Hide Items
                 bool bNewShowUserHidden = GUILayout.Toggle(m_bShowUserHidden, "Hidden", EditorStyles.toolbarButton, new[] { GUILayout.MaxWidth(80) });
                 if (bNewShowUserHidden != m_bShowUserHidden)
@@ -366,12 +378,14 @@ namespace VersionControl.UserInterface
                     UpdateFilteringOfKeys();
                 }
 
-                bool newShowModifiedProjectSettings = GUILayout.Toggle(showProjectSetting, "Project Settings", EditorStyles.toolbarButton, new[] { GUILayout.MaxWidth(95) });
-                if (newShowModifiedProjectSettings != showProjectSetting)
+                //Stella: External Items
+                bool bNewShowExternal = GUILayout.Toggle(m_bShowExternal, "External", EditorStyles.toolbarButton, new[] { GUILayout.MaxWidth(80) });
+                if (bNewShowExternal != m_bShowExternal)
                 {
-                    showProjectSetting = newShowModifiedProjectSettings;
+                    m_bShowExternal = bNewShowExternal;
                     UpdateFilteringOfKeys();
                 }
+
 
                 bool newShowModifiedNoLock = GUILayout.Toggle(showModifiedNoLock, Terminology.localModified, EditorStyles.toolbarButton, new[] { GUILayout.MaxWidth(90) });
                 if (newShowModifiedNoLock != showModifiedNoLock)

@@ -110,14 +110,14 @@ namespace VersionControl
             return vcc.Update(assets);
         }
 
-        public virtual bool Commit(IEnumerable<string> assets, string commitMessage = "")
+        public virtual bool Commit(IEnumerable<string> assets, string commitMessage = "", bool _bEmptyDepth = false)
         {
-            return vcc.Commit(assets, commitMessage);
+            return vcc.Commit(assets, commitMessage, _bEmptyDepth);
         }
 
-        public virtual bool Add(IEnumerable<string> assets)
+        public virtual bool Add(IEnumerable<string> assets, bool _bEmptyDepth = false)
         {
-            return vcc.Add(assets);
+            return vcc.Add(assets, _bEmptyDepth);
         }
 
         public virtual bool Revert(IEnumerable<string> assets)

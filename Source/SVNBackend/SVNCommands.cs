@@ -388,6 +388,8 @@ namespace VersionControl.Backend.SVN
                     throw new VCConnectionTimeoutException(errStr, commandLine.ToString());
                 else if (errStr.Contains("W200017"))  // Ignore warning relating to use of propget on non-existing property in SVN 1.9+
                     commandLineOutput = new CommandLineOutput(commandLineOutput.Command, commandLineOutput.Arguments, commandLineOutput.OutputStr, "", 0);
+                else if (errStr.Contains("W150002") || errStr.Contains("E200009"))  // Ignore warnings and errors relating to adding already added files (might happen because of folders seen as normal instead of unversioned)
+                    commandLineOutput = new CommandLineOutput(commandLineOutput.Command, commandLineOutput.Arguments, commandLineOutput.OutputStr, "", 0);
                 else
                     throw new VCException(errStr, commandLine.ToString());
             }
@@ -528,14 +530,20 @@ namespace VersionControl.Backend.SVN
             return CreateOperation("update --force" + ConcatAssetPaths(assets)) && RequestStatus(assets, StatusLevel.Previous);
         }
 
-        public bool Commit(IEnumerable<string> assets, string commitMessage = "")
+        public bool Commit(IEnumerable<string> assets, string commitMessage = "", bool _bEmptyDepth = false)
         {
-            return CreateAssetOperation("commit -m \"" + UnifyLineEndingsChar(ReplaceCommentChar(commitMessage)) + "\"", assets);
+            string strArg = _bEmptyDepth ? " --depth=empty" : "";
+            return CreateAssetOperation("commit" + strArg + " -m \"" + UnifyLineEndingsChar(ReplaceCommentChar(commitMessage)) + "\"", assets);
         }
 
-        public bool Add(IEnumerable<string> assets)
+        public bool Add(IEnumerable<string> assets, bool _bEmptyDepth = false)
         {
-            return CreateAssetOperation("add", assets);
+            string strTargets = "";
+            foreach (string str in assets)
+                strTargets += str + " ; ";
+            D.Log("Adding manually(Empty: " + _bEmptyDepth + "): " + strTargets);
+            string strArg = _bEmptyDepth ? " --depth=empty" : "";
+            return CreateAssetOperation("add" + strArg, assets);
         }
 
         public bool Revert(IEnumerable<string> assets)

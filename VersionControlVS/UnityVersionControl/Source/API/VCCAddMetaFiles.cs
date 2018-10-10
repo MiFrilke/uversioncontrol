@@ -34,14 +34,14 @@ namespace VersionControl
             return base.Update(AddMeta(assets));
         }
 
-        public override bool Commit(IEnumerable<string> assets, string commitMessage = "")
+        public override bool Commit(IEnumerable<string> assets, string commitMessage = "", bool _bEmptyDepth = false)
         {
-            return base.Commit(AddMeta(assets), commitMessage);
+            return base.Commit(AddMeta(assets), commitMessage, _bEmptyDepth);
         }
 
-        public override bool Add(IEnumerable<string> assets)
+        public override bool Add(IEnumerable<string> assets, bool _bEmptyDepth = false)
         {
-            return base.Add(AddMeta(assets));
+            return base.Add(AddMeta(assets), _bEmptyDepth);
         }
 
         public override bool Revert(IEnumerable<string> assets)

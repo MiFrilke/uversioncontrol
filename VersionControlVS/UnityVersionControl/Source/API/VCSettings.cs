@@ -37,6 +37,7 @@ namespace VersionControl
             includeDepedenciesAsDefault = EditorPrefs.GetBool("VCSSettings/includeDepedenciesAsDefault", true);
             requireLockBeforeCommit = EditorPrefs.GetBool("VCSSettings/requireLockBeforeCommit", false);
             selectiveCommit = EditorPrefs.GetBool("VCSSettings/selectiveCommit", false);
+            nonRecursiveAdd = EditorPrefs.GetBool("VCSSettings/nonRecursiveAdd", false);
             saveStrategy = (ESaveAssetsStrategy)EditorPrefs.GetInt("VCSSettings/saveStrategy", (int)ESaveAssetsStrategy.Unity);
             versionControlBackend = (EVersionControlBackend)EditorPrefs.GetInt("VCSSettings/versionControlBackend", (int)EVersionControlBackend.None);
             handleFileMove = (EHandleFileMove)EditorPrefs.GetInt("VCSSettings/handleFileMove", (int)EHandleFileMove.Simple);
@@ -70,6 +71,7 @@ namespace VersionControl
                 EditorPrefs.SetBool("VCSSettings/includeDepedenciesAsDefault", includeDepedenciesAsDefault);
                 EditorPrefs.SetBool("VCSSettings/requireLockBeforeCommit", requireLockBeforeCommit);
                 EditorPrefs.SetBool("VCSSettings/selectiveCommit", selectiveCommit);
+                EditorPrefs.SetBool("VCSSettings/nonRecursiveAdd", nonRecursiveAdd);
                 EditorPrefs.SetInt("VCSSettings/saveStrategy", (int)saveStrategy);
                 EditorPrefs.SetInt("VCSSettings/versionControlBackend", (int)versionControlBackend);
                 EditorPrefs.SetInt("VCSSettings/handleFileMove", (int)handleFileMove);
@@ -222,7 +224,10 @@ namespace VersionControl
 
         private static bool selectiveCommit;
         public static bool SelectiveCommit { get { return selectiveCommit; } set { if (selectiveCommit != value) { selectiveCommit = value; OnSettingsChanged(); } } }
-        
+
+        private static bool nonRecursiveAdd;
+        public static bool NonRecursiveAdd { get { return nonRecursiveAdd; } set { if (nonRecursiveAdd != value) { nonRecursiveAdd = value; OnSettingsChanged(); } } }
+
         private static ESaveAssetsStrategy saveStrategy;
         public static ESaveAssetsStrategy SaveStrategy { get { return saveStrategy; } set { if (saveStrategy != value) { saveStrategy = value; OnSettingsChanged(); } } }
 

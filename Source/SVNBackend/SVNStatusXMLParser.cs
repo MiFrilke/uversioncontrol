@@ -69,12 +69,15 @@ namespace VersionControl.Backend.SVN
             }
 
             XmlNodeList changelists = xmlDoc.GetElementsByTagName("changelist");
+
             foreach (XmlNode changelistIt in changelists)
             {
                 string changelist = changelistIt.Attributes["name"].InnerText;
+
                 foreach (XmlNode entryIt in changelistIt.ChildNodes)
                 {
                     ComposedString assetPath = new ComposedString((entryIt.Attributes["path"].InnerText.Replace('\\', '/')).Trim());
+
                     if (statusDatabase.ContainsKey(assetPath))
                     {
                         statusDatabase[assetPath].changelist = changelist;
@@ -88,6 +91,7 @@ namespace VersionControl.Backend.SVN
 
             foreach (var assetPathIt in new List<ComposedString>(statusDatabase.Keys))
             {
+
                 string assetPathStr = assetPathIt.Compose();
                 if (Directory.Exists(assetPathStr))
                 {
@@ -164,7 +168,7 @@ namespace VersionControl.Backend.SVN
             return
                 Directory.GetFiles(assetPath, "*", SearchOption.AllDirectories)
                     .Concat(Directory.GetDirectories(assetPath, "*", SearchOption.AllDirectories))
-                    .Where(a => File.Exists(a) && !a.Contains("/.") && !a.Contains("\\.") && (File.GetAttributes(a) & FileAttributes.Hidden) == 0)
+                    .Where(a => (File.Exists(a) || Directory.Exists(a)) && !a.Contains("/.") && !a.Contains("\\.") && (File.GetAttributes(a) & FileAttributes.Hidden) == 0)
                     .Select(s => s.Replace("\\", "/"));
         }
 

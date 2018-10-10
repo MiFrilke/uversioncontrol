@@ -58,11 +58,11 @@ namespace VersionControl.Backend.Noop
         {
             return true;
         }
-        public virtual bool Commit(IEnumerable<string> assets, string commitMessage = "")
+        public virtual bool Commit(IEnumerable<string> assets, string commitMessage = "", bool _bEmptyDepth = false)
         {
             return true;
         }
-        public virtual bool Add(IEnumerable<string> assets)
+        public virtual bool Add(IEnumerable<string> assets, bool _bEmptyDepth = false)
         {
             return true;
         }
