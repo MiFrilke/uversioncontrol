@@ -139,7 +139,7 @@ namespace VersionControl.UserInterface
                 VCSettings.AutoCloseAfterSuccess = GUILayout.Toggle(VCSettings.AutoCloseAfterSuccess, new GUIContent("Auto Close", "Auto close commit window on successful commit\nDefault: Off"));
                 VCSettings.IncludeDepedenciesAsDefault = GUILayout.Toggle(VCSettings.IncludeDepedenciesAsDefault, new GUIContent("Select Dependencies", "Should dependencies automatically be selected when opening the commit window\nDefault: On"));
                 VCSettings.SelectiveCommit = GUILayout.Toggle(VCSettings.SelectiveCommit, new GUIContent("Selective Commit", "Add an additional selection column which is used to more explicitly select which files to commit\nDefault: Off"));
-                VCSettings.NonRecursiveAdd = GUILayout.Toggle(VCSettings.NonRecursiveAdd, new GUIContent("Selective Commit", "Add an additional selection column which is used to more explicitly select which files to commit\nDefault: Off"));
+                VCSettings.NonRecursiveAdd = GUILayout.Toggle(VCSettings.NonRecursiveAdd, new GUIContent("Non-Recursive Add", "Add an additional selection column which is used to more explicitly select which files to commit\nDefault: Off"));
                 VCSettings.RequireLockBeforeCommit = GUILayout.Toggle(VCSettings.RequireLockBeforeCommit, new GUIContent("Require " + Terminology.getlock + " on commit", "It will be enforced that all non-mergable files are " + Terminology.getlock + " before commit\nDefault: Off"));
             }
             GUILayout.Label("Debug", EditorStyles.boldLabel);
