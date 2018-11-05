@@ -156,6 +156,8 @@ namespace CommandLineExecution
                     }
                     else
                     {
+                        //if (!process.WaitForExit(30000))
+                        //    aborted = true;
                         process.WaitForExit();
                         break;
                     }

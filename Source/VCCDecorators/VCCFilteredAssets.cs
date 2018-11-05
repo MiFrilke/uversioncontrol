@@ -67,7 +67,7 @@ namespace VersionControl
 
 
             bool result =
-                base.Add(filesInFolders./*UnversionedInVersionedFolder(vcc).*/ShortestFirst().Distinct(), _bEmptyDepth) &&
+                base.Add(filesInFolders.UnversionedInVersionedFolder(vcc).ShortestFirst().Distinct(), _bEmptyDepth) &&
                 base.Delete(filesInFolders.Missing(vcc), OperationMode.Normal) &&
                 base.Commit(filesInFolders.ShortestFirst(), commitMessage, _bEmptyDepth) &&
                 Status(assets, StatusLevel.Local) &&
