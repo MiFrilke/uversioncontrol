@@ -205,8 +205,8 @@ namespace VersionControl.UserInterface
                             statusScroll.y = Mathf.Infinity;
                             Repaint();
                         };
-                        foreach (string str in selectedAssets)
-                            Debug.Log("Committing: " + str);
+                        //foreach (string str in selectedAssets)
+                        //    Debug.Log("Committing: " + str);
                         var commitTask = VCCommands.Instance.CommitTask(selectedAssets, CommitMessage, VCSettings.NonRecursiveAdd);
                         commitTask.ContinueWithOnNextUpdate(result =>
                         {
