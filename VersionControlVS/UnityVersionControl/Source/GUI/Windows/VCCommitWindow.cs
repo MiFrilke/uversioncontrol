@@ -277,9 +277,9 @@ namespace VersionControl.UserInterface
             }
             else
             {
-                if ((GUI.Button(rect, m_strSuggestion, GUI.skin.label)) || (Event.current.type == EventType.keyDown && (Event.current.keyCode == KeyCode.KeypadEnter || Event.current.keyCode == KeyCode.Return)))
+                if ((GUI.Button(rect, m_strSuggestion, GUI.skin.label)) || (Event.current.type == EventType.KeyDown && (Event.current.keyCode == KeyCode.KeypadEnter || Event.current.keyCode == KeyCode.Return)))
                 { m_window.suggesitonInput(m_iOriginalLength, m_strSuggestion); bAccepted = true; editorWindow.Repaint(); }
-                else if (Event.current.type == EventType.mouseDown || Event.current.type == EventType.mouseUp || Event.current.type == EventType.KeyDown)
+                else if (Event.current.type == EventType.MouseDown || Event.current.type == EventType.MouseUp || Event.current.type == EventType.KeyDown)
                 { m_window.suggesitonInput(); if (m_window) m_window.Focus(); else this.editorWindow.Close(); }
             }
         }

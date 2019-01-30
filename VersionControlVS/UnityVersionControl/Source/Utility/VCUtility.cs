@@ -36,7 +36,7 @@ namespace VersionControl
         public static Object Revert(Object obj, bool _bForced = false)
         {
             var gameObject = obj as GameObject;
-            if (gameObject && PrefabHelper.IsPrefab(gameObject, true, false, true) && !PrefabHelper.IsPrefabParent(gameObject))
+            if (gameObject && PrefabHelper.IsPrefab(gameObject, true, false, false, true) && !PrefabHelper.IsPrefabAsset(gameObject))
             {
                 return RevertPrefab(gameObject, _bForced);
             }
@@ -54,9 +54,8 @@ namespace VersionControl
         }
 
         private static GameObject RevertPrefab(GameObject gameObject, bool _bForced = false)
-        {
-            PrefabHelper.ReconnectToLastPrefab(gameObject);
-            PrefabUtility.RevertPrefabInstance(gameObject);
+        {            
+            PrefabUtility.RevertPrefabInstance(gameObject, _bForced ? InteractionMode.AutomatedAction : InteractionMode.UserAction);
 
             if (ShouldVCRevert(gameObject))
             {
@@ -76,14 +75,14 @@ namespace VersionControl
             return
                 material && ManagedByRepository(assetStatus) ||
                 ((assetStatus.lockStatus == VCLockStatus.LockedHere || assetStatus.ModifiedOrLocalEditAllowed()) && VCCommands.Instance.Ready) &&
-                PrefabHelper.IsPrefab(obj, true, false, true);
+                PrefabHelper.IsPrefab(obj, true, false, false, true);
         }
 
         public static void ApplyAndCommit(Object obj, string commitMessage = "", bool showCommitDialog = true)
         {
             var gameObject = obj as GameObject;
             if (ObjectUtilities.ChangesStoredInScene(obj)) SceneManagerUtilities.SaveActiveScene();
-            if (PrefabHelper.IsPrefab(gameObject, true, false) && !PrefabHelper.IsPrefabParent(obj)) PrefabHelper.ApplyPrefab(gameObject);
+            if (PrefabHelper.IsPrefab(gameObject, true, false, false, true) && !PrefabHelper.IsPrefabAsset(obj)) PrefabHelper.ApplyPrefab(gameObject);
             if (onHierarchyCommit != null) onHierarchyCommit(obj);
             VCCommands.Instance.CommitDialog(obj.ToAssetPaths(), showCommitDialog, commitMessage);
         }
@@ -197,23 +196,6 @@ namespace VersionControl
             VCDeleteWithConfirmation(obj.ToAssetPaths(), showConfirmation);
         }
 
-        public static string GetObjectTypeName(Object obj)
-        {
-            string objectType = "Unknown Type";
-            if (PrefabHelper.IsPrefab(obj, false, true, true)) objectType = PrefabHelper.IsPrefabParent(obj) ? "Model" : "Model in Scene";
-            if (PrefabHelper.IsPrefab(obj, true, false, true)) objectType = "Prefab";
-            if (!PrefabHelper.IsPrefab(obj, true, true, true)) objectType = "Scene";
-
-            if (PrefabHelper.IsPrefab(obj, true, false, true))
-            {
-                if (PrefabHelper.IsPrefabParent(obj)) objectType += " Asset";
-                else if (PrefabHelper.IsPrefabRoot(obj)) objectType += " Root";
-                else objectType += " Child";
-            }
-
-            return objectType;
-        }
-
         static string binary2TextPath = null;
         static string GetBinaryConverterPath()
         {
@@ -236,7 +218,7 @@ namespace VersionControl
                             Directory.CreateDirectory(tempDirectory);
                         string convertedBaseFile = tempDirectory + Path.GetFileName(assetPath) + ".svn-base";
                         string convertedWorkingCopyFile = tempDirectory + Path.GetFileName(assetPath) + ".svn-wc";
-                        var baseConvertCommand = new CommandLineExecution.CommandLine(GetBinaryConverterPath(), baseAssetPath + " "  + convertedBaseFile, ".").Execute();
+                        var baseConvertCommand = new CommandLineExecution.CommandLine(GetBinaryConverterPath(), baseAssetPath + " " + convertedBaseFile, ".").Execute();
                         var workingCopyConvertCommand = new CommandLineExecution.CommandLine(GetBinaryConverterPath(), assetPath + " " + convertedWorkingCopyFile, ".").Execute();
                         EditorUtility.InvokeDiffTool("Working Base : " + convertedWorkingCopyFile, convertedBaseFile, "Working Copy : " + convertedWorkingCopyFile, convertedWorkingCopyFile, convertedWorkingCopyFile, convertedBaseFile);
                     }
@@ -248,9 +230,9 @@ namespace VersionControl
             }
         }
 
-        static readonly ComposedString[] requiresTextConversionPostfix  = new ComposedString[] { ".unity", ".prefab", ".mat", ".asset", ".anim"};
-        static readonly ComposedString[] mergablePostfix                = new ComposedString[] { ".cs", ".js", ".boo", ".text", ".shader", ".txt", ".xml", ".cginc" };
-        
+        static readonly ComposedString[] requiresTextConversionPostfix = new ComposedString[] { ".unity", ".prefab", ".mat", ".asset", ".anim" };
+        static readonly ComposedString[] mergablePostfix = new ComposedString[] { ".cs", ".js", ".boo", ".text", ".shader", ".txt", ".xml", ".cginc" };
+
         public static bool IsDiffableAsset(ComposedString assetPath)
         {
             return true;

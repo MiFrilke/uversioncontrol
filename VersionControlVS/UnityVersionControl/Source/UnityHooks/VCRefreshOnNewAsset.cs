@@ -184,7 +184,7 @@ namespace VersionControl
         static GameObjectToAssetPathCache()
         {
             VCCommands.Instance.StatusCompleted += () => ClearObjectToAssetPathCache();
-            EditorApplication.hierarchyWindowChanged += () => ClearObjectToAssetPathCache();
+            EditorApplication.hierarchyChanged += () => ClearObjectToAssetPathCache();
         }
 
         public static void ClearObjectToAssetPathCache()

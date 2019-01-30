@@ -13,6 +13,7 @@ namespace VersionControl
         public const string lockedBy = "Opened by ";
         public const string update = "Update";
         public const string unlock = "Unlock";
+        public const string unpack = "Unpack";
         public const string status = "Refresh";
         public const string delete = "Delete";
         public const string unversioned = "Unversioned";

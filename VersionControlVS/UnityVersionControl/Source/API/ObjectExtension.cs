@@ -30,13 +30,13 @@ namespace VersionControl
         public static bool ChangesStoredInPrefab(Object obj)
         {
             obj = GetObjectIndirection(obj);
-            return PrefabHelper.IsPrefabParent(obj) || PrefabHelper.IsPrefab(obj, true, false, true);
+            return PrefabHelper.IsPrefabAsset(obj) || PrefabHelper.IsPrefab(obj, true, false, true, true);
         }
 
         public static string ObjectToAssetPath(Object obj, bool includingPrefabs = true)
         {
             obj = GetObjectIndirection(obj);
-            if (includingPrefabs && PrefabHelper.IsPrefab(obj) && !PrefabHelper.IsPrefabParent(obj)) return AssetDatabase.GetAssetPath(PrefabHelper.GetPrefabParent(obj));
+            if (includingPrefabs && PrefabHelper.IsPrefab(obj, includeMissingAsset: false) && !PrefabHelper.IsPrefabAsset(obj)) return AssetDatabase.GetAssetPath(PrefabHelper.GetPrefabSource(obj));
             return AssetDatabase.GetAssetOrScenePath(obj);
         }
     }

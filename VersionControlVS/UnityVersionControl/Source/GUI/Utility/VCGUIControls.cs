@@ -127,7 +127,7 @@ namespace VersionControl.UserInterface
 
         public struct ValidActions
         {
-            public bool showLog, showAdd, showOpen, showDiff, showCommit, showRevert, showDelete, showOpenLocal, showUnlock, showUpdate, showForceOpen, showDisconnect;
+            public bool showLog, showAdd, showOpen, showDiff, showCommit, showRevert, showDelete, showOpenLocal, showUnlock, showUpdate, showForceOpen, showUnpack;
         }
 
         public static ValidActions GetValidActions(string assetPath, Object instance = null)
@@ -136,7 +136,7 @@ namespace VersionControl.UserInterface
 
             ValidActions validActions;
             bool isPrefab = instance != null && PrefabHelper.IsPrefab(instance);
-            bool isPrefabParent = isPrefab && PrefabHelper.IsPrefabParent(instance);
+            bool isPrefabAsset = isPrefab && PrefabHelper.IsPrefabAsset(instance);
             bool isFolder = Directory.Exists(assetPath);
             bool diffableAsset = VCUtility.IsDiffableAsset(assetPath);
             bool mergableAsset = VCUtility.IsMergableAsset(assetPath);
@@ -167,7 +167,7 @@ namespace VersionControl.UserInterface
             validActions.showUnlock     = !pending && !ignored && !allowLocalEdit && haveLock;
             validActions.showUpdate     = !pending && !ignored && !added && managedByRep && instance != null;
             validActions.showForceOpen  = !pending && !ignored && !deleted && !isFolder && !allowLocalEdit && !unversioned && !added && lockedByOther && Event.current.shift;
-            validActions.showDisconnect = isPrefab && !isPrefabParent;
+            validActions.showUnpack     = !pending && !ignored && !deleted && !isFolder && isPrefab && !isPrefabAsset;
 
             return validActions;
         }
@@ -197,7 +197,7 @@ namespace VersionControl.UserInterface
                     if (validActions.showForceOpen) menu.AddItem(new GUIContent("Force " + Terminology.getlock),false, () => GetLock(assetPath, instance, OperationMode.Force));
                     if (validActions.showCommit)    menu.AddItem(new GUIContent(Terminology.commit),            false, () => Commit(assetPath, instance));
                     if (validActions.showUnlock)    menu.AddItem(new GUIContent(Terminology.unlock),            false, () => VCCommands.Instance.ReleaseLock(new[] { assetPath }));
-                    if (validActions.showDisconnect)menu.AddItem(new GUIContent("Disconnect"),                  false, () => PrefabHelper.DisconnectPrefab(instance as GameObject));
+                    if (validActions.showUnpack)    menu.AddItem(new GUIContent(Terminology.unpack),            false, () => PrefabHelper.UnpackPrefab(instance as GameObject));
                     if (validActions.showDelete)    menu.AddItem(new GUIContent(Terminology.delete),            false, () => VCCommands.Instance.DeleteDialog(new[] { assetPath }));
                     if (validActions.showRevert)    menu.AddItem(new GUIContent(Terminology.revert),            false, () => Revert(assetPath, instance));
                 }
