@@ -38,13 +38,17 @@ internal class MultiColumnView
         return m_liItems[_iID];
     }
 
-    public int iParentOfStatus(int _iID)
+    public int iParentOfStatus(int _iID, Dictionary<string, int> _dicDirectoryPathIdx)
     {
         if ((Column)m_treeView.multiColumnHeader.sortedColumnIndex == Column.AssetPath)
         {
             string strDirPath = System.IO.Path.GetDirectoryName(m_liItems[_iID].assetPath.Compose()).Replace('\\', '/');
-            int iIndex = m_liItems.FindIndex(x => (x.assetPath.Compose() == strDirPath));
-            return iIndex;
+
+            int iDirIdx;
+            if (!_dicDirectoryPathIdx.TryGetValue(strDirPath, out iDirIdx))
+                iDirIdx = -1;
+
+            return iDirIdx;
         }
         else
             return -1;
@@ -122,6 +126,9 @@ internal class MultiColumnView
     private Column m_columnSortedBefore;
     private void onSortingChanged(MultiColumnHeader _header)
     {
+        if (m_columnSortedBefore == (Column)_header.sortedColumnIndex)
+            return;
+
         m_liItems.Sort(compareItems);
 
         rebuildTreeView();
