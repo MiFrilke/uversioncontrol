@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -46,32 +47,97 @@ class VCTreeView : TreeView
 
     }
 
+    public static bool IsDirectory(string path)
+    {
+        if (Directory.Exists(path))
+        {
+            // get the file attributes for file or directory
+            var fileAttr = File.GetAttributes(path);
+            if ((fileAttr & FileAttributes.Directory) == FileAttributes.Directory)
+                return true;
+
+        }
+        return false;
+    }
+
+    private const string cBuildRootProgressBarTitle = "UVC: Preparing TreeView";
+
     protected override TreeViewItem BuildRoot()
     {
         VCTreeViewItem root = new VCTreeViewItem { id = 0, depth = -1, displayName = "Root" };
 
+        Dictionary<string, int> dicDirectoryPathIdx = new Dictionary<string, int>();
+
+        int iStatusCount = m_View.iStatusCount();
+        bool bShowProgressBar = iStatusCount > 100;
+
+        if (bShowProgressBar)
+        {
+            EditorUtility.DisplayCancelableProgressBar(cBuildRootProgressBarTitle, "Setup", 0);
+        }
+
         List<TreeViewItem> liItems = new List<TreeViewItem>();
-        for (int i = 0; i < m_View.iStatusCount(); i++)
+        for (int i = 0; i < iStatusCount; i++)
         {
             VersionControl.VersionControlStatus status = m_View.statusAtId(i);
             VCTreeViewItem treeViewItem = new VCTreeViewItem { id = i + 1, displayName = "Meow", m_data = status };
             liItems.Add(treeViewItem);
+
+            string strDirPath = null;
+            if (IsDirectory(strDirPath = treeViewItem.m_data.assetPath.Compose()))
+            {
+                if (!dicDirectoryPathIdx.ContainsKey(strDirPath))
+                {
+                    dicDirectoryPathIdx.Add(strDirPath, i);
+                }
+            }
+
+            if (bShowProgressBar)
+            {
+                if (EditorUtility.DisplayCancelableProgressBar(cBuildRootProgressBarTitle, "Setup", (i / (float)iStatusCount) * 0.5f))
+                {
+                    EditorUtility.ClearProgressBar();
+                    return root;
+                }
+            }
+        }
+
+        if (bShowProgressBar)
+        {
+            EditorUtility.DisplayCancelableProgressBar(cBuildRootProgressBarTitle, "Parenting", 0.5f);
         }
 
         for (int i = 0; i < liItems.Count; i++)
         {
-            int iParent = m_View.iParentOfStatus(i);
+            int iParent = m_View.iParentOfStatus(i, dicDirectoryPathIdx);
             if (iParent < 0)
                 root.AddChild(liItems[i]);
             else
                 liItems[iParent].AddChild(liItems[i]);
+            if (bShowProgressBar)
+            {
+                if (EditorUtility.DisplayCancelableProgressBar(cBuildRootProgressBarTitle, "Parenting", (i / (float)liItems.Count) * 0.5f + 0.5f))
+                {
+                    EditorUtility.ClearProgressBar();
+                    return root;
+                }
+            }
+        }
+
+        if (bShowProgressBar)
+        {
+            EditorUtility.DisplayCancelableProgressBar(cBuildRootProgressBarTitle, "Finalizing TreeView...", 1f);
         }
 
         SetupDepthsFromParentsAndChildren(root);
 
+        if (bShowProgressBar)
+        {
+            EditorUtility.ClearProgressBar();
+        }
+
         return root;
     }
-
 
 
     protected override IList<TreeViewItem> BuildRows(TreeViewItem root)
@@ -254,7 +320,7 @@ class VCTreeView : TreeView
         base.DoubleClickedItem(id);
 
         VCTreeViewItem item = FindItem(id, rootItem) as VCTreeViewItem;
-        if (VersionControl.VCUtility.IsDiffableAsset(item.m_data.assetPath) && VersionControl.VCUtility.ManagedByRepository(item.m_data) 
+        if (VersionControl.VCUtility.IsDiffableAsset(item.m_data.assetPath) && VersionControl.VCUtility.ManagedByRepository(item.m_data)
                 && item.m_data.fileStatus == VersionControl.VCFileStatus.Modified)
             VersionControl.VCUtility.DiffWithBase(item.m_data.assetPath.Compose());
         else
@@ -263,7 +329,7 @@ class VCTreeView : TreeView
 
     public List<VersionControl.VersionControlStatus> liSelectedData()
     {
-         List<VersionControl.VersionControlStatus> liResult = new List<VersionControl.VersionControlStatus>();
+        List<VersionControl.VersionControlStatus> liResult = new List<VersionControl.VersionControlStatus>();
         IList<TreeViewItem> liItems = FindRows(GetSelection());
         for (int i = 0; i < liItems.Count; i++)
             liResult.Add((liItems[i] as VCTreeViewItem).m_data);

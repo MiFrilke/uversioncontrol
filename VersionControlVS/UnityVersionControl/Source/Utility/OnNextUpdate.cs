@@ -29,7 +29,10 @@ namespace VersionControl
         {
             lock (mLockToken)
             {
-                mActionQueue.Enqueue(work);
+                if (!mActionQueue.Contains(work))
+                {
+                    mActionQueue.Enqueue(work);
+                }
             }
         }
 
