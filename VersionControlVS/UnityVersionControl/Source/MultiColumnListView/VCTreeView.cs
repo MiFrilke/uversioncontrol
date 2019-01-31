@@ -47,16 +47,21 @@ class VCTreeView : TreeView
 
     }
 
-    public static bool IsDirectory(string path)
+    public static bool IsDirectory(string path, VersionControl.VCFileStatus fileStatus)
     {
+        if (fileStatus == VersionControl.VCFileStatus.Deleted || fileStatus == VersionControl.VCFileStatus.Missing)
+        {
+            return !Path.HasExtension(path);
+        }
+
         if (Directory.Exists(path))
         {
             // get the file attributes for file or directory
             var fileAttr = File.GetAttributes(path);
             if ((fileAttr & FileAttributes.Directory) == FileAttributes.Directory)
                 return true;
-
         }
+
         return false;
     }
 
@@ -84,7 +89,7 @@ class VCTreeView : TreeView
             liItems.Add(treeViewItem);
 
             string strDirPath = null;
-            if (IsDirectory(strDirPath = treeViewItem.m_data.assetPath.Compose()))
+            if (IsDirectory(strDirPath = treeViewItem.m_data.assetPath.Compose(), treeViewItem.m_data.fileStatus))
             {
                 if (!dicDirectoryPathIdx.ContainsKey(strDirPath))
                 {
