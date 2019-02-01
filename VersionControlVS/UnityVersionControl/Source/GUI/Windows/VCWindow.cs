@@ -53,7 +53,8 @@ namespace VersionControl.UserInterface
 
         private string m_strHiddenOld = "";
 
-        [MenuItem("Window/UVC/Overview Window %0", false, 1)]
+
+        [MenuItem("Window/UVC/Overview Window %u", false, 1)]
         public static void Init()
         {
             EditorWindow window = GetWindow<VCWindow>(desiredDockNextTo: typeof(SceneView));
