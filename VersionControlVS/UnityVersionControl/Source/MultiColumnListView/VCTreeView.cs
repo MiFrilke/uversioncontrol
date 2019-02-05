@@ -74,7 +74,7 @@ class VCTreeView : TreeView
         Dictionary<string, int> dicDirectoryPathIdx = new Dictionary<string, int>();
 
         int iStatusCount = m_View.iStatusCount();
-        bool bShowProgressBar = iStatusCount > 100;
+        bool bShowProgressBar = iStatusCount > 500;
 
         if (bShowProgressBar)
         {
